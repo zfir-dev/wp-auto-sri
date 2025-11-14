@@ -3,68 +3,95 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.1
+Stable tag: 1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Automatically adds Subresource Integrity (SRI) to ALL external scripts and styles — including ones loaded by wp_enqueue, hard-coded HTML, and scripts injected dynamically by JavaScript.
+Automatically adds Subresource Integrity (SRI) to external scripts and styles, with safe automatic exclusions for Google reCAPTCHA, Google Fonts, and other dynamic resources.
 
 == Description ==
 
-WP Auto SRI is a lightweight security plugin that automatically generates SHA-384 Subresource Integrity (SRI) hashes for **every external script or stylesheet** on your website.
+**WP Auto SRI** automatically adds Subresource Integrity (SRI) attributes to scripts and styles loaded from external sources.
 
-Unlike most plugins, WP Auto SRI supports:
+This improves security, protects against tampering, and enables strict Content Security Policy (CSP) setups.
 
-* Scripts enqueued via `wp_enqueue_script()`
-* Styles enqueued via `wp_enqueue_style()`
-* Raw `<script>` and `<link>` tags output directly by themes and plugins
-* Scripts injected dynamically via JavaScript (e.g. analytics, cookie banners)
-* Performance caching — hashes only generated once, then stored
-* Zero configuration — works immediately after activation
+### Features
 
-This helps improve security, increase browser trust, and enforce strong CSP headers.
+* ✔ Adds SRI to all external `<script>` and `<link>` tags  
+* ✔ Supports WordPress-enqueued assets and raw HTML tags  
+* ✔ Supports async, defer, crossorigin, and multiline script tags  
+* ✔ Caches all hashes for performance  
+* ✔ Automatically skips non-SRI-compatible providers:
+    - Google reCAPTCHA  
+    - Google Fonts (fonts.googleapis.com / fonts.gstatic.com)  
+    - Dynamic script loaders and runtime-inserted scripts  
+* ✔ Safe for Elementor, WooCommerce, CookieYes, Jetpack, GoDaddy hosting, etc.
 
-Ideal for users implementing:
+### Why some scripts are excluded
 
-* Content Security Policy (CSP) with `require-sri-for script style`
-* Security scanners requiring SRI
-* Strict mode WordPress security setups
+Some providers load **dynamic content** — the content can change depending on browser version, device, region, or session.  
+Such scripts cannot safely support SRI.
+
+This plugin automatically excludes:
+
+* Google reCAPTCHA (`google.com/recaptcha`)  
+* Google Fonts stylesheets (`fonts.googleapis.com`)  
+* Google Fonts font files (`fonts.gstatic.com`)  
+* Other dynamic inline loaders (CookieYes, wsimg, ywxi, etc.)
+
+Want to whitelist a dynamic provider? Contact us at izafirsk@gmail.com.
+
+These exclusions prevent:
+
+* CORS failures  
+* Integrity mismatch blocking  
+* Google reCAPTCHA from breaking  
+* Google Fonts from disappearing  
+* Layout shifts caused by blocked assets
 
 == Installation ==
 
-1. Upload the plugin folder to `/wp-content/plugins/wp-auto-sri`
-2. Activate the plugin through the "Plugins" menu in WordPress
-3. No configuration needed — SRI is applied automatically
+1. Upload the plugin to `/wp-content/plugins/wp-auto-sri`
+2. Activate it through **Plugins → Installed Plugins**
+3. SRI will be added automatically to all compatible external assets
+
+No configuration required.
 
 == Frequently Asked Questions ==
 
-= Does this plugin modify local plugin files? =  
-No. It only rewrites the final HTML output with proper SRI attributes.
+= Why are some scripts not receiving SRI? =  
+Scripts from Google reCAPTCHA, Google Fonts, wsimg, ywxi, and other dynamic sources cannot support SRI because their content changes on every request.
 
-= Does this work with scripts added using JavaScript? =  
-Yes. The plugin uses output buffering to apply SRI to all external scripts that appear in the final HTML.
+This plugin intelligently detects those sources and safely skips them.
 
-= Does this slow down my website? =  
-No. Each hash is cached with `update_option()` and reused on every load.
+= Does this affect performance? =  
+No. SRI hashes are computed once and stored in the WordPress options table.
 
-= Which hashing algorithm is used? =  
-SHA-384 (recommended by modern browsers). Support for SHA-256 and SHA-512 is planned.
+= Does this break Elementor or CookieYes? =  
+No. This plugin is fully compatible and tested against common dynamic script loaders.
 
-= Does it break async or defer attributes? =  
-No. All existing tag attributes are preserved.
+= Does this plugin help with CSP? =  
+Yes — it allows you to safely enforce:
+
+For excluded domains, you should whitelist them in your CSP.
 
 == Screenshots ==
 
-1. Example of SRI added to external script tags
+1. Example of SRI added to external script tags in the page source
 
 == Changelog ==
 
+= 1.3 =
+* Added automatic exclusion of Google reCAPTCHA (fixes CORS / blocked script issues)
+* Added automatic exclusion of Google Fonts (fixes integrity mismatch issues)
+* Improved compatibility with Google APIs and Elementor
+* Updated SRI matching and handling logic
+* Stable, safe version for production use
+
 = 1.2 =
-* Added universal script/link matching (supports async, defer, single quotes, multiline tags, injected scripts)
-* Added support for CookieYes, wsimg, ywxi.net, and host-injected scripts
-* Improved reliability with multiline and malformed tag detection
-* Full compatibility with dynamic JavaScript loaders
-* Version bump and cleanup
+* Added universal script/link matching (supports async, defer, single quotes, multiline)
+* Improved handling for CookieYes, wsimg, ywxi
+* Better compatibility with dynamic script loaders
 
 = 1.1 =
 Added output buffering to rewrite ALL external script/style tags and inject SRI.
@@ -74,5 +101,5 @@ Initial release.
 
 == Upgrade Notice ==
 
-= 1.2 =
-This update adds FULL SRI coverage to all dynamic, injected, and non-standard script tags. Update recommended for maximum security.
+= 1.3 =
+This update fixes Google reCAPTCHA and Google Fonts breakage by safely excluding dynamic resources that cannot support SRI. Highly recommended for all users.

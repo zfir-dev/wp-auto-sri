@@ -28,15 +28,6 @@ class WP_Auto_SRI {
         // ============================
         // UNIVERSAL SCRIPT MATCHER
         // ============================
-        // Supports:
-        // - single/double quotes
-        // - multiline scripts
-        // - async/defer
-        // - self-closing <script />
-        // - any attribute order
-        // - injected scripts from CookieYes, wsimg, ywxi, analytics, etc.
-        // ============================
-
         $html = preg_replace_callback(
             '#<script\b([^>]*)\bsrc=(["\'])(https?://[^"\']+)\2([^>]*)>(?:</script>)?#is',
             function ($matches) {
@@ -50,6 +41,27 @@ class WP_Auto_SRI {
                 if (stripos($full, 'integrity=') !== false) {
                     return $full;
                 }
+
+                // ============================
+                // GOOGLE EXCLUSIONS
+                // ============================
+
+                // 1. Google reCAPTCHA (dynamic)
+                if (preg_match('#google\.com/recaptcha#i', $url)) {
+                    return $full;
+                }
+
+                // 2. Google Fonts CSS (dynamic)
+                if (strpos($url, 'fonts.googleapis.com') !== false) {
+                    return $full;
+                }
+
+                // 3. Google reCAPTCHA subresources
+                if (strpos($url, 'gstatic.com/recaptcha') !== false) {
+                    return $full;
+                }
+
+                // ============================
 
                 $sri = WP_Auto_SRI::get_sri_hash($url);
                 if (!$sri) return $full;
@@ -82,6 +94,22 @@ class WP_Auto_SRI {
                     return $full;
                 }
 
+                // ============================
+                // GOOGLE EXCLUSIONS
+                // ============================
+
+                // 1. Google Fonts CSS — dynamic content, not SRI compatible
+                if (strpos($url, 'fonts.googleapis.com') !== false) {
+                    return $full;
+                }
+
+                // 2. Google Fonts font files (safe to SRI, but they are loaded by CSS)
+                if (strpos($url, 'fonts.gstatic.com') !== false) {
+                    return $full;
+                }
+
+                // ============================
+
                 $sri = WP_Auto_SRI::get_sri_hash($url);
                 if (!$sri) return $full;
 
@@ -103,10 +131,31 @@ class WP_Auto_SRI {
             return $tag;
         }
 
-        // Skip if SRI already present
+        // Skip if already has SRI
         if (strpos($tag, 'integrity=') !== false) {
             return $tag;
         }
+
+        // ============================
+        // GOOGLE EXCLUSIONS
+        // ============================
+
+        // reCAPTCHA
+        if (preg_match('#google\.com/recaptcha#i', $src)) {
+            return $tag;
+        }
+
+        // Google Fonts stylesheet
+        if (strpos($src, 'fonts.googleapis.com') !== false) {
+            return $tag;
+        }
+
+        // Google Fonts font files
+        if (strpos($src, 'fonts.gstatic.com') !== false) {
+            return $tag;
+        }
+
+        // ============================
 
         $sri = self::get_sri_hash($src);
         if (!$sri) return $tag;
