@@ -1,9 +1,11 @@
 <?php
 /**
  * Plugin Name: WP Auto SRI
- * Description: Automatically generates Subresource Integrity (SRI) hashes for external scripts and styles.
- * Version: 1.0
- * Author: Zafir Sk Heerah
+ * Description: Automatically adds Subresource Integrity (SRI) to ALL external scripts and styles — including ones injected by plugins, themes, and inline JavaScript.
+ * Version: 1.1
+ * Author: Zafir
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) exit;
