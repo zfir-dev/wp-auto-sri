@@ -1,0 +1,14 @@
+{
+    "name": "zfir/wp-auto-sri",
+    "description": "Automatically generates SRI hashes for external assets.",
+    "type": "wordpress-plugin",
+    "require-dev": {
+      "phpunit/phpunit": "^9.6",
+      "yoast/phpunit-polyfills": "^4.0"
+    },
+    "autoload": {
+      "psr-4": {
+        "WP_Auto_SRI\\": "includes/"
+      }
+    }
+  }
