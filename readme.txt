@@ -1,5 +1,5 @@
 === WP Auto SRI ===
-Contributors: zafir
+Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
 Tested up to: 6.7
