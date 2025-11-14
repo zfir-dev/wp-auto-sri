@@ -59,14 +59,20 @@ No. All existing tag attributes are preserved.
 
 == Changelog ==
 
+= 1.2 =
+* Added universal script/link matching (supports async, defer, single quotes, multiline tags, injected scripts)
+* Added support for CookieYes, wsimg, ywxi.net, and host-injected scripts
+* Improved reliability with multiline and malformed tag detection
+* Full compatibility with dynamic JavaScript loaders
+* Version bump and cleanup
+
 = 1.1 =
-Added full-page SRI injection using output buffering.  
-Now supports scripts injected by JavaScript and raw HTML script tags.
+Added output buffering to rewrite ALL external script/style tags and inject SRI.
 
 = 1.0 =
 Initial release.
 
 == Upgrade Notice ==
 
-= 1.1 =
-Improved security by adding SRI support for dynamically-injected scripts and non-enqueued assets.
+= 1.2 =
+This update adds FULL SRI coverage to all dynamic, injected, and non-standard script tags. Update recommended for maximum security.

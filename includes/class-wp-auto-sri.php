@@ -25,52 +25,67 @@ class WP_Auto_SRI {
      */
     public static function rewrite_output($html) {
 
-        // Process <script> tags
-        $html = preg_replace_callback(
-            '#<script([^>]*)src=["\'](https?://[^"\']+)["\']([^>]*)></script>#i',
-            function($matches) {
-                $fullTag = $matches[0];
-                $attrsBefore = $matches[1];
-                $url = $matches[2];
-                $attrsAfter = $matches[3];
+        // ============================
+        // UNIVERSAL SCRIPT MATCHER
+        // ============================
+        // Supports:
+        // - single/double quotes
+        // - multiline scripts
+        // - async/defer
+        // - self-closing <script />
+        // - any attribute order
+        // - injected scripts from CookieYes, wsimg, ywxi, analytics, etc.
+        // ============================
 
-                // Skip if integrity already present
-                if (strpos($fullTag, 'integrity=') !== false) {
-                    return $fullTag;
+        $html = preg_replace_callback(
+            '#<script\b([^>]*)\bsrc=(["\'])(https?://[^"\']+)\2([^>]*)>(?:</script>)?#is',
+            function ($matches) {
+
+                $before = $matches[1];
+                $url    = $matches[3];
+                $after  = $matches[4];
+                $full   = $matches[0];
+
+                // Skip if SRI already exists
+                if (stripos($full, 'integrity=') !== false) {
+                    return $full;
                 }
 
                 $sri = WP_Auto_SRI::get_sri_hash($url);
-                if (!$sri) return $fullTag;
+                if (!$sri) return $full;
 
-                // Rebuild the script tag
-                return "<script{$attrsBefore} src=\"{$url}\" integrity=\"{$sri}\" crossorigin=\"anonymous\"{$attrsAfter}></script>";
+                return "<script{$before} src=\"{$url}\" integrity=\"{$sri}\" crossorigin=\"anonymous\"{$after}></script>";
             },
             $html
         );
 
-        // Process <link rel="stylesheet"> tags
-        $html = preg_replace_callback(
-            '#<link([^>]*)href=["\'](https?://[^"\']+)["\']([^>]*)>#i',
-            function($matches) {
-                $fullTag = $matches[0];
-                $attrsBefore = $matches[1];
-                $url = $matches[2];
-                $attrsAfter = $matches[3];
+        // ============================
+        // UNIVERSAL LINK MATCHER
+        // ============================
 
-                // Skip non-stylesheet links
-                if (stripos($fullTag, 'rel=') !== false && stripos($fullTag, 'stylesheet') === false) {
-                    return $fullTag;
+        $html = preg_replace_callback(
+            '#<link\b([^>]*)\bhref=(["\'])(https?://[^"\']+)\2([^>]*)>#is',
+            function ($matches) {
+
+                $before = $matches[1];
+                $url    = $matches[3];
+                $after  = $matches[4];
+                $full   = $matches[0];
+
+                // Apply only to rel=stylesheet
+                if (stripos($full, 'rel=') !== false && stripos($full, 'stylesheet') === false) {
+                    return $full;
                 }
 
-                // Skip if integrity already present
-                if (strpos($fullTag, 'integrity=') !== false) {
-                    return $fullTag;
+                // Skip if already has SRI
+                if (stripos($full, 'integrity=') !== false) {
+                    return $full;
                 }
 
                 $sri = WP_Auto_SRI::get_sri_hash($url);
-                if (!$sri) return $fullTag;
+                if (!$sri) return $full;
 
-                return "<link{$attrsBefore} href=\"{$url}\" integrity=\"{$sri}\" crossorigin=\"anonymous\"{$attrsAfter}>";
+                return "<link{$before} href=\"{$url}\" integrity=\"{$sri}\" crossorigin=\"anonymous\"{$after}>";
             },
             $html
         );
@@ -79,7 +94,7 @@ class WP_Auto_SRI {
     }
 
     /**
-     * Standard WP enqueue filter-based injection (still needed)
+     * Standard WP enqueue filter-based injection
      */
     public static function inject_sri($tag, $handle, $src, $media = null) {
 
@@ -105,7 +120,7 @@ class WP_Auto_SRI {
             );
         }
 
-        // Styles
+        // Stylesheets
         if (str_starts_with(trim($tag), '<link')) {
             return str_replace(
                 '<link',
@@ -128,11 +143,13 @@ class WP_Auto_SRI {
         if ($cached) return $cached;
 
         $response = wp_remote_get($url, ['timeout' => 10]);
+
         if (is_wp_error($response)) return false;
 
         $body = wp_remote_retrieve_body($response);
         if (!$body) return false;
 
+        // SHA-384 recommended by browsers
         $hash = base64_encode(hash('sha384', $body, true));
         $sri  = "sha384-$hash";
 

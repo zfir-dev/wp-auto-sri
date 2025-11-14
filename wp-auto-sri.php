@@ -1,9 +1,9 @@
 <?php
 /**
  * Plugin Name: WP Auto SRI
- * Description: Automatically adds Subresource Integrity (SRI) to ALL external scripts and styles — including ones injected by plugins, themes, and inline JavaScript.
- * Version: 1.1
- * Author: Zafir
+ * Description: Automatically adds Subresource Integrity (SRI) to ALL external scripts and styles — including dynamically injected tags and raw HTML.
+ * Version: 1.2
+ * Author: Zafir Sk Heerah
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
