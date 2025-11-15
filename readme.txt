@@ -1,9 +1,9 @@
-=== WP Auto SRI ===
+=== Auto SRI for WordPress ===
 Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.3
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,7 +51,7 @@ These exclusions prevent:
 
 == Installation ==
 
-1. Upload the plugin to `/wp-content/plugins/wp-auto-sri`
+1. Upload the plugin to `/wp-content/plugins/auto-sri-for-wordpress`
 2. Activate it through **Plugins → Installed Plugins**
 3. SRI will be added automatically to all compatible external assets
 
@@ -81,6 +81,16 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 1.5 =
+* Renamed plugin to comply with WordPress.org trademark policies
+* Updated all assets and paths
+* Stability improvements
+
+= 1.4 =
+* Added new plugin banner + icon assets
+* Visual branding improvements
+* Updated readme and asset packaging
+
 = 1.3 =
 * Added automatic exclusion of Google reCAPTCHA (fixes CORS / blocked script issues)
 * Added automatic exclusion of Google Fonts (fixes integrity mismatch issues)
@@ -101,5 +111,7 @@ Initial release.
 
 == Upgrade Notice ==
 
-= 1.3 =
-This update fixes Google reCAPTCHA and Google Fonts breakage by safely excluding dynamic resources that cannot support SRI. Highly recommended for all users.
+== Upgrade Notice ==
+
+= 1.5 =
+This update renames the plugin to comply with WordPress.org policies. You must update to continue receiving updates.
