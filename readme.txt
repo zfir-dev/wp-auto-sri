@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.3
+Stable tag: 1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,11 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 1.4 =
+* Added new plugin banner + icon assets
+* Visual branding improvements
+* Updated readme and asset packaging
+
 = 1.3 =
 * Added automatic exclusion of Google reCAPTCHA (fixes CORS / blocked script issues)
 * Added automatic exclusion of Google Fonts (fixes integrity mismatch issues)
@@ -101,5 +106,6 @@ Initial release.
 
 == Upgrade Notice ==
 
-= 1.3 =
-This update fixes Google reCAPTCHA and Google Fonts breakage by safely excluding dynamic resources that cannot support SRI. Highly recommended for all users.
+= 1.4 =
+New plugin branding added (icons + banners), improved asset packaging, minor stability fixes.  
+Recommended update for all users.
