@@ -2,7 +2,7 @@
 Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.8
 Stable tag: 1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -113,8 +113,6 @@ Added output buffering to rewrite ALL external script/style tags and inject SRI.
 
 = 1.0 =
 Initial release.
-
-== Upgrade Notice ==
 
 == Upgrade Notice ==
 
