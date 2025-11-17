@@ -41,7 +41,7 @@ if (!function_exists('plugin_dir_path')) {
 
 if (!function_exists('plugin_dir_url')) {
     function plugin_dir_url($file) {
-        return 'https://example.com/wp-content/plugins/wp-auto-sri/';
+        return 'https://example.com/wp-content/plugins/auto-sri-for-wordpress/';
     }
 }
 
@@ -74,7 +74,7 @@ if (!function_exists('update_option')) {
 if (!function_exists('wp_remote_get')) {
     function wp_remote_get($url, $args = []) {
         return [
-            'body' => "console.log('wp-auto-sri');"
+            'body' => "console.log('auto-sri-for-wordpress');"
         ];
     }
 }
@@ -99,4 +99,4 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 // -------------------------------------------------------------
 // 4. Load the plugin file (now that WP stubs exist)
 // -------------------------------------------------------------
-require_once dirname(__DIR__) . '/wp-auto-sri.php';
+require_once dirname(__DIR__) . '/auto-sri-for-wordpress.php';

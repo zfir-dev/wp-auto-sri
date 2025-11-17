@@ -5,7 +5,7 @@
          backupGlobals="false">
 
     <testsuites>
-        <testsuite name="wp-auto-sri">
+        <testsuite name="auto-sri-for-wordpress">
             <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>
