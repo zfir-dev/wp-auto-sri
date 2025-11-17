@@ -1,9 +1,9 @@
-=== Auto SRI for WordPress ===
+=== Auto SRI ===
 Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.5
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,7 +51,7 @@ These exclusions prevent:
 
 == Installation ==
 
-1. Upload the plugin to `/wp-content/plugins/auto-sri-for-wordpress`
+1. Upload the plugin to `/wp-content/plugins/auto-sri`
 2. Activate it through **Plugins → Installed Plugins**
 3. SRI will be added automatically to all compatible external assets
 
@@ -80,6 +80,11 @@ For excluded domains, you should whitelist them in your CSP.
 1. Example of SRI added to external script tags in the page source
 
 == Changelog ==
+
+= 1.6 =
+* Renamed plugin to comply with WordPress.org trademark policies
+* Updated all assets and paths
+* Stability improvements
 
 = 1.5 =
 * Renamed plugin to comply with WordPress.org trademark policies
@@ -113,5 +118,5 @@ Initial release.
 
 == Upgrade Notice ==
 
-= 1.5 =
+= 1.6 =
 This update renames the plugin to comply with WordPress.org policies. You must update to continue receiving updates.
