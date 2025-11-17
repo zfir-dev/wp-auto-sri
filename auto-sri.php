@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Auto SRI for WordPress
+ * Plugin Name: Auto SRI
  * Description: Automatically adds Subresource Integrity (SRI) to external scripts and styles, while safely excluding dynamic content such as Google reCAPTCHA and Google Fonts.
  * Version: 1.5
  * Author: Zafir Sk Heerah
@@ -10,6 +10,6 @@
 
 if (!defined('ABSPATH')) exit;
 
-require_once plugin_dir_path(__FILE__) . 'includes/class-auto-sri-for-wordpress.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-auto-sri.php';
 
 add_action('plugins_loaded', ['WP_Auto_SRI', 'init']);

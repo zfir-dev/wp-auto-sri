@@ -1,5 +1,5 @@
 {
-    "name": "zfir/auto-sri-for-wordpress",
+    "name": "zfir/auto-sri",
     "description": "Automatically generates SRI hashes for external assets.",
     "type": "wordpress-plugin",
     "require-dev": {

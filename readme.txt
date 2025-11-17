@@ -1,4 +1,4 @@
-=== Auto SRI for WordPress ===
+=== Auto SRI ===
 Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
@@ -51,7 +51,7 @@ These exclusions prevent:
 
 == Installation ==
 
-1. Upload the plugin to `/wp-content/plugins/auto-sri-for-wordpress`
+1. Upload the plugin to `/wp-content/plugins/auto-sri`
 2. Activate it through **Plugins → Installed Plugins**
 3. SRI will be added automatically to all compatible external assets
 
