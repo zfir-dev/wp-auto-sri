@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, headers, performance
 Requires at least: 5.0
 Tested up to: 6.7
-Stable tag: 1.5
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -81,6 +81,11 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 1.6 =
+* Renamed plugin to comply with WordPress.org trademark policies
+* Updated all assets and paths
+* Stability improvements
+
 = 1.5 =
 * Renamed plugin to comply with WordPress.org trademark policies
 * Updated all assets and paths
@@ -113,5 +118,5 @@ Initial release.
 
 == Upgrade Notice ==
 
-= 1.5 =
+= 1.6 =
 This update renames the plugin to comply with WordPress.org policies. You must update to continue receiving updates.
