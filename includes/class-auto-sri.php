@@ -23,6 +23,7 @@ class WP_Auto_SRI {
     /**
      * Handles rewriting of final HTML to add SRI to ALL external scripts & styles
      */
+    // phpcs:disable WordPress.WP.EnqueuedResources.NonEnqueuedScript
     public static function rewrite_output($html) {
 
         // ============================
@@ -120,10 +121,10 @@ class WP_Auto_SRI {
 
         return $html;
     }
-
     /**
      * Standard WP enqueue filter-based injection
-     */
+    */
+    // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedScript
     public static function inject_sri($tag, $handle, $src, $media = null) {
 
         // Skip internal files

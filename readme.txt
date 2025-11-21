@@ -1,13 +1,13 @@
 === Auto SRI ===
 Contributors: Zafir Sk Heerah
-Tags: security, sri, integrity, csp, headers, performance
+Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.6
+Stable tag: 1.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Automatically adds Subresource Integrity (SRI) to external scripts and styles, with safe automatic exclusions for Google reCAPTCHA, Google Fonts, and other dynamic resources.
+Automatically adds Subresource Integrity (SRI) to external scripts/styles and safely excludes Google reCAPTCHA and Google Fonts.
 
 == Description ==
 
@@ -81,6 +81,11 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 1.7 =
+* Code quality improvements
+* WordPress coding standards compliance
+* Optimized readme for plugin repository
+
 = 1.6 =
 * Renamed plugin to comply with WordPress.org trademark policies
 * Updated all assets and paths
@@ -116,5 +121,5 @@ Initial release.
 
 == Upgrade Notice ==
 
-= 1.6 =
-This update renames the plugin to comply with WordPress.org policies. You must update to continue receiving updates.
+= 1.7 =
+Code quality improvements and WordPress coding standards compliance.
