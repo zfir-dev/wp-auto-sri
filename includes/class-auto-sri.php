@@ -64,7 +64,7 @@ class AutoSRI {
 
                 // ============================
 
-                $sri = AutoSR_Plugin::get_sri_hash($url);
+                $sri = AutoSRI::get_sri_hash($url);
                 if (!$sri) return $full;
 
                 return "<script{$before} src=\"{$url}\" integrity=\"{$sri}\" crossorigin=\"anonymous\"{$after}></script>";
@@ -187,7 +187,7 @@ class AutoSRI {
      */
     public static function get_sri_hash($url) {
 
-        $cache_key = 'autosr_' . md5($url);
+        $cache_key = 'autosri_' . md5($url);
         $cached = get_option($cache_key);
 
         if ($cached) return $cached;
