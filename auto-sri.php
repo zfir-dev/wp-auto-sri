@@ -12,4 +12,4 @@ if (!defined('ABSPATH')) exit;
 
 require_once plugin_dir_path(__FILE__) . 'includes/class-auto-sri.php';
 
-add_action('plugins_loaded', ['WP_Auto_SRI', 'init']);
+add_action('plugins_loaded', ['AutoSRI', 'init']);

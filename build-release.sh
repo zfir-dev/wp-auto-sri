@@ -36,6 +36,8 @@ zip -r "$ZIP_NAME" wp-auto-sri \
   -x "wp-auto-sri/.DS_Store" \
   -x "wp-auto-sri/*/.DS_Store" \
   -x "wp-auto-sri/.*" \
+  -x "wp-auto-sri/assets/**" \
+  -x "wp-auto-sri/wp-tests-config.php" \
   -x "wp-auto-sri/build-release.sh"
 
 echo "✓ Release zip created: $ZIP_NAME"

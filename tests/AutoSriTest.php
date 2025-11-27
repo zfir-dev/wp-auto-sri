@@ -14,7 +14,7 @@ class AutoSriTest extends TestCase {
         $handle = 'my-script';
         $src    = 'https://cdn.example.com/app.js';
 
-        $result = WP_Auto_SRI::inject_sri($tag, $handle, $src);
+        $result = AutoSRI::inject_sri($tag, $handle, $src);
 
         echo "\n=== test_injects_sri_for_external_scripts ===\n";
         echo "Input:  $tag\n";
@@ -32,7 +32,7 @@ class AutoSriTest extends TestCase {
         $handle = 'my-script';
         $src    = 'https://example.com/app.js';
 
-        $result = WP_Auto_SRI::inject_sri($tag, $handle, $src);
+        $result = AutoSRI::inject_sri($tag, $handle, $src);
 
         echo "\n=== test_does_not_modify_internal_scripts ===\n";
         echo "Input:  $tag\n";
@@ -49,7 +49,7 @@ class AutoSriTest extends TestCase {
         $handle = 'my-script';
         $src    = 'https://cdn.com/app.js';
 
-        $result = WP_Auto_SRI::inject_sri($tag, $handle, $src);
+        $result = AutoSRI::inject_sri($tag, $handle, $src);
 
         echo "\n=== test_does_not_duplicate_integrity ===\n";
         echo "Input:  $tag\n";
@@ -67,7 +67,7 @@ class AutoSriTest extends TestCase {
         $src    = 'https://cdn.com/style.css';
         $media  = 'all';
 
-        $result = WP_Auto_SRI::inject_sri($tag, $handle, $src, $media);
+        $result = AutoSRI::inject_sri($tag, $handle, $src, $media);
 
         echo "\n=== test_style_tag_integrity ===\n";
         echo "Input:  $tag\n";

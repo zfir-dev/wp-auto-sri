@@ -11,7 +11,7 @@ Automatically adds Subresource Integrity (SRI) to external scripts/styles and sa
 
 == Description ==
 
-**WP Auto SRI** automatically adds Subresource Integrity (SRI) attributes to scripts and styles loaded from external sources.
+**Auto SRI** automatically adds Subresource Integrity (SRI) attributes to scripts and styles loaded from external sources.
 
 This improves security, protects against tampering, and enables strict Content Security Policy (CSP) setups.
 
