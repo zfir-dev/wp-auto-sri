@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.7
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -11,7 +11,7 @@ Automatically adds Subresource Integrity (SRI) to external scripts/styles and sa
 
 == Description ==
 
-**WP Auto SRI** automatically adds Subresource Integrity (SRI) attributes to scripts and styles loaded from external sources.
+**Auto SRI** automatically adds Subresource Integrity (SRI) attributes to scripts and styles loaded from external sources.
 
 This improves security, protects against tampering, and enables strict Content Security Policy (CSP) setups.
 
@@ -81,6 +81,11 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 1.8 =
+* Fixed prefixing issues to comply with WordPress standards
+* Improved security by preventing direct file access
+* Excluded development assets from release package
+
 = 1.7 =
 * Code quality improvements
 * WordPress coding standards compliance
@@ -121,5 +126,7 @@ Initial release.
 
 == Upgrade Notice ==
 
-= 1.7 =
-Code quality improvements and WordPress coding standards compliance.
+= 1.8 =
+Refactored class name to comply with WordPress standards
+Fixed prefixing issues to comply with WordPress standards
+Fixed tests to comply with WordPress standards

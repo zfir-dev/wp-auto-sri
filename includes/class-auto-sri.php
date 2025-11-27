@@ -2,7 +2,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-class WP_Auto_SRI {
+class AutoSRI {
 
     public static function init() {
         // Standard WP enqueued assets
@@ -64,7 +64,7 @@ class WP_Auto_SRI {
 
                 // ============================
 
-                $sri = WP_Auto_SRI::get_sri_hash($url);
+                $sri = AutoSRI::get_sri_hash($url);
                 if (!$sri) return $full;
 
                 return "<script{$before} src=\"{$url}\" integrity=\"{$sri}\" crossorigin=\"anonymous\"{$after}></script>";
@@ -111,7 +111,7 @@ class WP_Auto_SRI {
 
                 // ============================
 
-                $sri = WP_Auto_SRI::get_sri_hash($url);
+                $sri = AutoSRI::get_sri_hash($url);
                 if (!$sri) return $full;
 
                 return "<link{$before} href=\"{$url}\" integrity=\"{$sri}\" crossorigin=\"anonymous\"{$after}>";
@@ -187,7 +187,7 @@ class WP_Auto_SRI {
      */
     public static function get_sri_hash($url) {
 
-        $cache_key = 'wp_auto_sri_' . md5($url);
+        $cache_key = 'autosri_' . md5($url);
         $cached = get_option($cache_key);
 
         if ($cached) return $cached;
