@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 // 🧪 TESTS
 // -------------------------------------------------------------
 
-class AutoSRI_Tests extends TestCase {
+class AutoSRI_Test extends TestCase {
 
     public function test_injects_sri_for_external_scripts() {
 
