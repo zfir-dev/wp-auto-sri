@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build script for creating WordPress plugin release zip
+# Build script for creating WordPress plugin zip
 
 # Get version from argument or extract from main plugin file
 if [ -n "$1" ]; then
@@ -14,12 +14,12 @@ else
   fi
 fi
 
-echo "Building release for version: $VERSION"
+echo "Building zip for version: $VERSION"
 
 # Change to parent directory
 cd "$(dirname "$0")/.."
 
-# Create release zip excluding development files
+# Create zip excluding development files
 ZIP_NAME="auto-sri-v${VERSION}.zip"
 
 zip -r "$ZIP_NAME" wp-auto-sri \
@@ -36,8 +36,8 @@ zip -r "$ZIP_NAME" wp-auto-sri \
   -x "wp-auto-sri/.DS_Store" \
   -x "wp-auto-sri/*/.DS_Store" \
   -x "wp-auto-sri/.*" \
-  -x "wp-auto-sri/assets/**" \
+  -x "wp-auto-sri/assets" \
   -x "wp-auto-sri/wp-tests-config.php" \
-  -x "wp-auto-sri/build-release.sh"
+  -x "wp-auto-sri/zip.sh"
 
-echo "✓ Release zip created: $ZIP_NAME"
+echo "✓ Zip created: $ZIP_NAME"
