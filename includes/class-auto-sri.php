@@ -17,6 +17,11 @@ class AutoSRI {
      * Start output buffering
      */
     public static function start_buffer() {
+        // Skip if in admin panel
+        if (is_admin()) {
+            return;
+        }
+        
         ob_start([__CLASS__, 'rewrite_output']);
     }
 
@@ -59,6 +64,16 @@ class AutoSRI {
 
                 // 3. Google reCAPTCHA subresources
                 if (strpos($url, 'gstatic.com/recaptcha') !== false) {
+                    return $full;
+                }
+
+                // 4. WordPress.com widgets (dynamic)
+                if (strpos($url, 'widgets.wp.com') !== false) {
+                    return $full;
+                }
+
+                // 5. Dynamic concatenated resources
+                if (strpos($url, '/_static/??') !== false) {
                     return $full;
                 }
 
@@ -109,6 +124,16 @@ class AutoSRI {
                     return $full;
                 }
 
+                // 3. WordPress.com widgets (dynamic)
+                if (strpos($url, 'widgets.wp.com') !== false) {
+                    return $full;
+                }
+
+                // 4. Dynamic concatenated resources
+                if (strpos($url, '/_static/??') !== false) {
+                    return $full;
+                }
+
                 // ============================
 
                 $sri = AutoSRI::get_sri_hash($url);
@@ -126,6 +151,11 @@ class AutoSRI {
     */
     // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedScript
     public static function inject_sri($tag, $handle, $src, $media = null) {
+
+        // Skip if in admin panel
+        if (is_admin()) {
+            return $tag;
+        }
 
         // Skip internal files
         if (!$src || strpos($src, home_url()) === 0) {
@@ -153,6 +183,16 @@ class AutoSRI {
 
         // Google Fonts font files
         if (strpos($src, 'fonts.gstatic.com') !== false) {
+            return $tag;
+        }
+
+        // WordPress.com widgets (dynamic)
+        if (strpos($src, 'widgets.wp.com') !== false) {
+            return $tag;
+        }
+
+        // Dynamic concatenated resources
+        if (strpos($src, '/_static/??') !== false) {
             return $tag;
         }
 
