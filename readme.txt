@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.8
+Stable tag: 1.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,22 +21,27 @@ This improves security, protects against tampering, and enables strict Content S
 * ✔ Supports WordPress-enqueued assets and raw HTML tags  
 * ✔ Supports async, defer, crossorigin, and multiline script tags  
 * ✔ Caches all hashes for performance  
+* ✔ Excludes admin panel (wp-admin) to prevent conflicts
 * ✔ Automatically skips non-SRI-compatible providers:
     - Google reCAPTCHA  
     - Google Fonts (fonts.googleapis.com / fonts.gstatic.com)  
+    - WordPress.com widgets (widgets.wp.com)
+    - Dynamic concatenated resources
     - Dynamic script loaders and runtime-inserted scripts  
 * ✔ Safe for Elementor, WooCommerce, CookieYes, Jetpack, GoDaddy hosting, etc.
 
 ### Why some scripts are excluded
-
-Some providers load **dynamic content** — the content can change depending on browser version, device, region, or session.  
-Such scripts cannot safely support SRI.
 
 This plugin automatically excludes:
 
 * Google reCAPTCHA (`google.com/recaptcha`)  
 * Google Fonts stylesheets (`fonts.googleapis.com`)  
 * Google Fonts font files (`fonts.gstatic.com`)  
+* WordPress.com widgets (`widgets.wp.com`)
+* Dynamic concatenated resources (`/_static/??`)
+* Other dynamic inline loaders (CookieYes, wsimg, ywxi, etc.)
+
+Want to whitelist a dynamic provider? Contact us at izafirsk@gmail.com.
 * Other dynamic inline loaders (CookieYes, wsimg, ywxi, etc.)
 
 Want to whitelist a dynamic provider? Contact us at izafirsk@gmail.com.
@@ -52,12 +57,15 @@ These exclusions prevent:
 == Installation ==
 
 1. Upload the plugin to `/wp-content/plugins/auto-sri`
-2. Activate it through **Plugins → Installed Plugins**
-3. SRI will be added automatically to all compatible external assets
-
-No configuration required.
-
 == Frequently Asked Questions ==
+
+= Does this plugin apply SRI in the WordPress admin panel? =
+No. The plugin automatically skips the WordPress admin panel (wp-admin) to prevent any conflicts with admin scripts and ensure smooth backend operation.
+
+= Why are some scripts not receiving SRI? =  
+Scripts from Google reCAPTCHA, Google Fonts, WordPress.com widgets, and other dynamic sources cannot support SRI because their content changes on every request.
+
+This plugin intelligently detects those sources and safely skips them.
 
 = Why are some scripts not receiving SRI? =  
 Scripts from Google reCAPTCHA, Google Fonts, wsimg, ywxi, and other dynamic sources cannot support SRI because their content changes on every request.
@@ -75,16 +83,20 @@ Yes — it allows you to safely enforce:
 
 For excluded domains, you should whitelist them in your CSP.
 
-== Screenshots ==
-
-1. Example of SRI added to external script tags in the page source
-
 == Changelog ==
+
+= 1.9 =
+* Added admin panel exclusion - SRI no longer applies in wp-admin
+* Added exclusion for WordPress.com widgets (widgets.wp.com)
+* Added exclusion for dynamic concatenated resources (/_static/??)
+* Fixed integrity mismatch errors for dynamic content
+* Improved compatibility with WordPress.com features
 
 = 1.8 =
 * Fixed prefixing issues to comply with WordPress standards
 * Improved security by preventing direct file access
 * Excluded development assets from release package
+* Example of SRI added to external script tags in the page source
 
 = 1.7 =
 * Code quality improvements
@@ -113,20 +125,7 @@ For excluded domains, you should whitelist them in your CSP.
 * Updated SRI matching and handling logic
 * Stable, safe version for production use
 
-= 1.2 =
-* Added universal script/link matching (supports async, defer, single quotes, multiline)
-* Improved handling for CookieYes, wsimg, ywxi
-* Better compatibility with dynamic script loaders
-
-= 1.1 =
-Added output buffering to rewrite ALL external script/style tags and inject SRI.
-
-= 1.0 =
-Initial release.
-
 == Upgrade Notice ==
 
-= 1.8 =
-Refactored class name to comply with WordPress standards
-Fixed prefixing issues to comply with WordPress standards
-Fixed tests to comply with WordPress standards
+= 1.9 =
+Admin panel exclusion added. WordPress.com widgets and dynamic concatenated resources now properly excluded to prevent integrity errors.
