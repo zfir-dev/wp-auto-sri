@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 2.0
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,10 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 2.1 =
+* Improved settings page UX with clearer instructions
+* Added "Settings" link to the plugin action links on the plugins page
+
 = 2.0 =
 * Added settings page to allow user-defined URL exclusions
 * Refactored exclusion logic for better maintainability (Unit tested)
@@ -131,5 +135,5 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Upgrade Notice ==
 
-= 2.0 =
-Added settings page for user-defined exclusions. Refactored exclusion logic.
+= 2.1 =
+Improved settings page UX and added settings link.
