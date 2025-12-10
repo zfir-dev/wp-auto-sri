@@ -254,7 +254,13 @@ class AutoSRI {
         $value = get_option('auto_sri_exclusions', '');
         ?>
         <textarea name="auto_sri_exclusions" rows="10" cols="50" class="large-text code"><?php echo esc_textarea($value); ?></textarea>
-        <p class="description">Enter domains, filenames, or full URLs (one per line).<br>For example: <code>ads.google.com</code> or <code>my-dynamic-script.js</code>.</p>
+        <p class="description">
+            Enter domains, filenames, or full URLs to exclude.<br>
+            <strong>Important:</strong> Enter each exclusion on a new line.<br>
+            For example:<br>
+            <code>ads.google.com</code><br>
+            <code>my-dynamic-script.js</code>
+        </p>
         <?php
     }
 
