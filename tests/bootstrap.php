@@ -91,6 +91,65 @@ if (!function_exists('is_wp_error')) {
     }
 }
 
+// NEW STUBS FOR SETTINGS PAGE
+if (!function_exists('is_admin')) {
+    function is_admin() {
+        return false; // Default to frontend for tests unless mocked otherwise
+    }
+}
+
+if (!function_exists('add_options_page')) {
+    function add_options_page($page_title, $menu_title, $capability, $menu_slug, $function = '') {}
+}
+
+if (!function_exists('register_setting')) {
+    function register_setting($option_group, $option_name, $args = array()) {}
+}
+
+if (!function_exists('add_settings_section')) {
+    function add_settings_section($id, $title, $callback, $page) {}
+}
+
+if (!function_exists('add_settings_field')) {
+    function add_settings_field($id, $title, $callback, $page, $section = 'default', $args = array()) {}
+}
+
+if (!function_exists('settings_fields')) {
+    function settings_fields($option_group) {}
+}
+
+if (!function_exists('do_settings_sections')) {
+    function do_settings_sections($page) {}
+}
+
+if (!function_exists('submit_button')) {
+    function submit_button($text = null, $type = 'primary', $name = 'submit', $wrap = true, $other_attributes = null) {}
+}
+
+if (!function_exists('get_admin_page_title')) {
+    function get_admin_page_title() { return 'Auto SRI Settings'; }
+}
+
+if (!function_exists('current_user_can')) {
+    function current_user_can($capability) { return true; }
+}
+
+if (!function_exists('esc_html')) {
+    function esc_html($text) { return htmlspecialchars($text); }
+}
+
+if (!function_exists('esc_textarea')) {
+    function esc_textarea($text) { return htmlspecialchars($text); }
+}
+
+if (!function_exists('__')) {
+    function __($text, $domain = 'default') { return $text; }
+}
+
+if (!function_exists('_e')) {
+    function _e($text, $domain = 'default') { echo $text; }
+}
+
 // -------------------------------------------------------------
 // 3. Load Composer autoloader
 // -------------------------------------------------------------

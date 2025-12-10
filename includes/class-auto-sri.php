@@ -11,6 +11,10 @@ class AutoSRI {
 
         // Output buffer to catch ALL scripts (raw + injected)
         add_action('template_redirect', [__CLASS__, 'start_buffer']);
+
+        // Admin Settings
+        add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
+        add_action('admin_init', [__CLASS__, 'settings_init']);
     }
 
     /**
@@ -48,32 +52,8 @@ class AutoSRI {
                     return $full;
                 }
 
-                // ============================
-                // GOOGLE EXCLUSIONS
-                // ============================
-
-                // 1. Google reCAPTCHA (dynamic)
-                if (preg_match('#google\.com/recaptcha#i', $url)) {
-                    return $full;
-                }
-
-                // 2. Google Fonts CSS (dynamic)
-                if (strpos($url, 'fonts.googleapis.com') !== false) {
-                    return $full;
-                }
-
-                // 3. Google reCAPTCHA subresources
-                if (strpos($url, 'gstatic.com/recaptcha') !== false) {
-                    return $full;
-                }
-
-                // 4. WordPress.com widgets (dynamic)
-                if (strpos($url, 'widgets.wp.com') !== false) {
-                    return $full;
-                }
-
-                // 5. Dynamic concatenated resources
-                if (strpos($url, '/_static/??') !== false) {
+                // Check exclusions
+                if (self::is_excluded($url)) {
                     return $full;
                 }
 
@@ -110,31 +90,10 @@ class AutoSRI {
                     return $full;
                 }
 
-                // ============================
-                // GOOGLE EXCLUSIONS
-                // ============================
-
-                // 1. Google Fonts CSS — dynamic content, not SRI compatible
-                if (strpos($url, 'fonts.googleapis.com') !== false) {
+                // Check exclusions
+                if (self::is_excluded($url)) {
                     return $full;
                 }
-
-                // 2. Google Fonts font files (safe to SRI, but they are loaded by CSS)
-                if (strpos($url, 'fonts.gstatic.com') !== false) {
-                    return $full;
-                }
-
-                // 3. WordPress.com widgets (dynamic)
-                if (strpos($url, 'widgets.wp.com') !== false) {
-                    return $full;
-                }
-
-                // 4. Dynamic concatenated resources
-                if (strpos($url, '/_static/??') !== false) {
-                    return $full;
-                }
-
-                // ============================
 
                 $sri = AutoSRI::get_sri_hash($url);
                 if (!$sri) return $full;
@@ -167,36 +126,10 @@ class AutoSRI {
             return $tag;
         }
 
-        // ============================
-        // GOOGLE EXCLUSIONS
-        // ============================
-
-        // reCAPTCHA
-        if (preg_match('#google\.com/recaptcha#i', $src)) {
+        // Check exclusions
+        if (self::is_excluded($src)) {
             return $tag;
         }
-
-        // Google Fonts stylesheet
-        if (strpos($src, 'fonts.googleapis.com') !== false) {
-            return $tag;
-        }
-
-        // Google Fonts font files
-        if (strpos($src, 'fonts.gstatic.com') !== false) {
-            return $tag;
-        }
-
-        // WordPress.com widgets (dynamic)
-        if (strpos($src, 'widgets.wp.com') !== false) {
-            return $tag;
-        }
-
-        // Dynamic concatenated resources
-        if (strpos($src, '/_static/??') !== false) {
-            return $tag;
-        }
-
-        // ============================
 
         $sri = self::get_sri_hash($src);
         if (!$sri) return $tag;
@@ -220,6 +153,126 @@ class AutoSRI {
         }
 
         return $tag;
+    }
+
+    /**
+     * Check if the URL is excluded
+     */
+    public static function is_excluded($url) {
+        // ============================
+        // GOOGLE EXCLUSIONS (Hardcoded)
+        // ============================
+
+        // 1. Google reCAPTCHA
+        if (preg_match('#google\.com/recaptcha#i', $url)) {
+            return true;
+        }
+
+        // 2. Google Fonts CSS
+        if (strpos($url, 'fonts.googleapis.com') !== false) {
+            return true;
+        }
+
+        // 3. Google reCAPTCHA subresources / specific font files
+        if (strpos($url, 'gstatic.com/recaptcha') !== false || strpos($url, 'fonts.gstatic.com') !== false) {
+            return true;
+        }
+
+        // 4. WordPress.com widgets
+        if (strpos($url, 'widgets.wp.com') !== false) {
+            return true;
+        }
+
+        // 5. Dynamic concatenated resources
+        if (strpos($url, '/_static/??') !== false) {
+            return true;
+        }
+
+        // ============================
+        // USER DEFINED EXCLUSIONS
+        // ============================
+        $user_exclusions = get_option('auto_sri_exclusions', '');
+        if (!empty($user_exclusions)) {
+            $lines = explode("\n", $user_exclusions);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+
+                // Simple substring match
+                if (stripos($url, $line) !== false) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Add Admin Menu
+     */
+    public static function add_admin_menu() {
+        add_options_page(
+            'Auto SRI Settings',
+            'Auto SRI',
+            'manage_options',
+            'auto-sri',
+            [__CLASS__, 'settings_page_html']
+        );
+    }
+
+    /**
+     * Register Settings
+     */
+    public static function settings_init() {
+        register_setting('auto_sri', 'auto_sri_exclusions');
+
+        add_settings_section(
+            'auto_sri_section',
+            __('Exclusions', 'auto-sri'),
+            null,
+            'auto_sri'
+        );
+
+        add_settings_field(
+            'auto_sri_exclusions',
+            __('Excluded URLs (one per line)', 'auto-sri'),
+            [__CLASS__, 'exclusions_callback'],
+            'auto_sri',
+            'auto_sri_section'
+        );
+    }
+
+    /**
+     * Callback for the exclusions field
+     */
+    public static function exclusions_callback() {
+        $value = get_option('auto_sri_exclusions', '');
+        ?>
+        <textarea name="auto_sri_exclusions" rows="10" cols="50" class="large-text code"><?php echo esc_textarea($value); ?></textarea>
+        <p class="description">Enter part of the URL to exclude. For example: <code>ads.google.com</code> or <code>my-dynamic-script.js</code>.</p>
+        <?php
+    }
+
+    /**
+     * Settings Page HTML
+     */
+    public static function settings_page_html() {
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        ?>
+        <div class="wrap">
+            <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+            <form action="options.php" method="post">
+                <?php
+                settings_fields('auto_sri');
+                do_settings_sections('auto_sri');
+                submit_button('Save Settings');
+                ?>
+            </form>
+        </div>
+        <?php
     }
 
     /**
