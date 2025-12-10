@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 1.9
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,10 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 2.0 =
+* Added settings page to allow user-defined URL exclusions
+* Refactored exclusion logic for better maintainability (Unit tested)
+
 = 1.9 =
 * Added admin panel exclusion - SRI no longer applies in wp-admin
 * Added exclusion for WordPress.com widgets (widgets.wp.com)
@@ -127,5 +131,5 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Upgrade Notice ==
 
-= 1.9 =
-Admin panel exclusion added. WordPress.com widgets and dynamic concatenated resources now properly excluded to prevent integrity errors.
+= 2.0 =
+Added settings page for user-defined exclusions. Refactored exclusion logic.
