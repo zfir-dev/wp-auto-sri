@@ -15,6 +15,10 @@ class AutoSRI {
         // Admin Settings
         add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
         add_action('admin_init', [__CLASS__, 'settings_init']);
+
+        // Settings Link in Plugins List
+        $plugin_basename = plugin_basename(dirname(__DIR__) . '/auto-sri.php');
+        add_filter("plugin_action_links_" . $plugin_basename, [__CLASS__, 'add_plugin_action_links']);
     }
 
     /**
@@ -250,8 +254,17 @@ class AutoSRI {
         $value = get_option('auto_sri_exclusions', '');
         ?>
         <textarea name="auto_sri_exclusions" rows="10" cols="50" class="large-text code"><?php echo esc_textarea($value); ?></textarea>
-        <p class="description">Enter part of the URL to exclude. For example: <code>ads.google.com</code> or <code>my-dynamic-script.js</code>.</p>
+        <p class="description">Enter domains, filenames, or full URLs (one per line).<br>For example: <code>ads.google.com</code> or <code>my-dynamic-script.js</code>.</p>
         <?php
+    }
+
+    /**
+     * Add Settings Link to Plugins Page
+     */
+    public static function add_plugin_action_links($links) {
+        $settings_link = '<a href="options-general.php?page=auto-sri">Settings</a>';
+        array_unshift($links, $settings_link);
+        return $links;
     }
 
     /**

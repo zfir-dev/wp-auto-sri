@@ -150,6 +150,12 @@ if (!function_exists('_e')) {
     function _e($text, $domain = 'default') { echo $text; }
 }
 
+if (!function_exists('plugin_basename')) {
+    function plugin_basename($file) {
+        return basename(dirname($file)) . '/' . basename($file);
+    }
+}
+
 // -------------------------------------------------------------
 // 3. Load Composer autoloader
 // -------------------------------------------------------------
