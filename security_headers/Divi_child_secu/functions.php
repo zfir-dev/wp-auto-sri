@@ -1,5 +1,5 @@
 <?php
-if (!is_admin() && defined('CSP_NONCE')) {
+if (!is_admin() && !isset($_GET['et_fb']) && !isset($_GET['et_pb_preview']) && defined('CSP_NONCE')) {
     function generate_pub_csp() {
         // ajust rules and URLs as needed, they are usually specifically tailored to each site
         $csp = "upgrade-insecure-requests; " .
