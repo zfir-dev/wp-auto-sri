@@ -290,6 +290,17 @@ class AutoSRI {
                 submit_button('Save Settings');
                 ?>
             </form>
+            <div style="margin-top: 20px; padding: 15px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
+                <p><strong><?php esc_html_e('Enjoying Auto SRI? Consider supporting its development:', 'auto-sri'); ?></strong></p>
+                <p>
+                    <a href="https://www.paypal.com/donate/?hosted_button_id=YOUR_BUTTON_ID" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-right: 10px;">
+                        <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate via PayPal" style="vertical-align: middle;" />
+                    </a>
+                    <a href="https://www.buymeacoffee.com/YOUR_USERNAME" target="_blank" rel="noopener noreferrer">
+                        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px; vertical-align: middle;" />
+                    </a>
+                </p>
+            </div>
         </div>
         <?php
     }
