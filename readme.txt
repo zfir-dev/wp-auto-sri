@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 2.2
+Stable tag: 2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 2.3 =
+* Version bump to 2.3
+
 = 2.2 =
 * Updated support section with a cleaner PayPal button and improved copy
 
@@ -138,8 +141,5 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Upgrade Notice ==
 
-= 2.2 =
-Minor update to the support section on the settings page.
-
-= 2.1 =
-Improved settings page UX and added settings link.
+= 2.3 =
+Version bump to 2.3.
