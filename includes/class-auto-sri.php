@@ -290,14 +290,12 @@ class AutoSRI {
                 submit_button('Save Settings');
                 ?>
             </form>
-            <div style="margin-top: 20px; padding: 15px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04);">
-                <p><strong><?php esc_html_e('Enjoying Auto SRI? Consider supporting its development:', 'auto-sri'); ?></strong></p>
-                <p>
-                    <a href="https://www.paypal.com/donate/?hosted_button_id=YOUR_BUTTON_ID" target="_blank" rel="noopener noreferrer" style="display: inline-block; margin-right: 10px;">
-                        <img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate via PayPal" style="vertical-align: middle;" />
-                    </a>
-                    <a href="https://www.buymeacoffee.com/YOUR_USERNAME" target="_blank" rel="noopener noreferrer">
-                        <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 40px; vertical-align: middle;" />
+            <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 600px;">
+                <h3 style="margin-top: 0;"><?php esc_html_e('Like Auto SRI? Help keep it that way!', 'auto-sri'); ?></h3>
+                <p><?php esc_html_e('If Auto SRI has been useful to you, consider supporting its development with a one-time $5 contribution. It helps keep the plugin maintained and improved.', 'auto-sri'); ?></p>
+                <p style="margin-bottom: 0;">
+                    <a href="https://www.paypal.com/ncp/payment/K3VU2WF5GXRSS" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #0070ba; color: #fff; font-weight: 600; font-size: 15px; padding: 10px 22px; border-radius: 4px; text-decoration: none;">
+                        <?php esc_html_e('Help keep Auto SRI free — $5', 'auto-sri'); ?>
                     </a>
                 </p>
             </div>
