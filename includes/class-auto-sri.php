@@ -290,6 +290,15 @@ class AutoSRI {
                 submit_button('Save Settings');
                 ?>
             </form>
+            <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 600px;">
+                <h3 style="margin-top: 0;"><?php esc_html_e('Like Auto SRI? Help keep it that way!', 'auto-sri'); ?></h3>
+                <p><?php esc_html_e('If Auto SRI has been useful to you, consider supporting its development with a $5 contribution. It helps keep the plugin maintained and improved.', 'auto-sri'); ?></p>
+                <p style="margin-bottom: 0;">
+                    <a href="https://www.paypal.com/ncp/payment/K3VU2WF5GXRSS" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #0070ba; color: #fff; font-weight: 600; font-size: 15px; padding: 10px 22px; border-radius: 4px; text-decoration: none;">
+                        <?php esc_html_e('Help keep Auto SRI free — $5', 'auto-sri'); ?>
+                    </a>
+                </p>
+            </div>
         </div>
         <?php
     }
