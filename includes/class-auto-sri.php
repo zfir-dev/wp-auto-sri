@@ -3,6 +3,8 @@
 if (!defined('ABSPATH')) exit;
 
 class AutoSRI {
+    private const SETTINGS_UNLOCK_OPTION = 'auto_sri_settings_unlocked';
+    private const PAYMENT_URL = 'https://www.paypal.com/ncp/payment/K3VU2WF5GXRSS';
 
     public static function init() {
         // Standard WP enqueued assets
@@ -229,7 +231,11 @@ class AutoSRI {
      * Register Settings
      */
     public static function settings_init() {
-        register_setting('auto_sri', 'auto_sri_exclusions');
+        register_setting(
+            'auto_sri',
+            'auto_sri_exclusions',
+            ['sanitize_callback' => [__CLASS__, 'sanitize_exclusions']]
+        );
 
         add_settings_section(
             'auto_sri_section',
@@ -245,6 +251,27 @@ class AutoSRI {
             'auto_sri',
             'auto_sri_section'
         );
+    }
+
+    /**
+     * Prevent settings updates while locked.
+     */
+    public static function sanitize_exclusions($value) {
+        if (!self::is_settings_unlocked()) {
+            return get_option('auto_sri_exclusions', '');
+        }
+
+        if (function_exists('wp_unslash')) {
+            $value = wp_unslash($value);
+        }
+
+        $value = is_string($value) ? $value : '';
+
+        if (function_exists('sanitize_textarea_field')) {
+            return sanitize_textarea_field($value);
+        }
+
+        return trim($value);
     }
 
     /**
@@ -280,27 +307,61 @@ class AutoSRI {
         if (!current_user_can('manage_options')) {
             return;
         }
+
+        $is_unlocked = self::is_settings_unlocked();
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <form action="options.php" method="post">
-                <?php
-                settings_fields('auto_sri');
-                do_settings_sections('auto_sri');
-                submit_button('Save Settings');
-                ?>
-            </form>
-            <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 600px;">
-                <h3 style="margin-top: 0;"><?php esc_html_e('Like Auto SRI? Help keep it that way!', 'auto-sri'); ?></h3>
-                <p><?php esc_html_e('If Auto SRI has been useful to you, consider supporting its development with a $5 contribution. It helps keep the plugin maintained and improved.', 'auto-sri'); ?></p>
-                <p style="margin-bottom: 0;">
-                    <a href="https://www.paypal.com/ncp/payment/K3VU2WF5GXRSS" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #0070ba; color: #fff; font-weight: 600; font-size: 15px; padding: 10px 22px; border-radius: 4px; text-decoration: none;">
-                        <?php esc_html_e('Help keep Auto SRI free — $5', 'auto-sri'); ?>
-                    </a>
-                </p>
-            </div>
+
+            <?php if ($is_unlocked) : ?>
+                <form action="options.php" method="post">
+                    <?php
+                    settings_fields('auto_sri');
+                    do_settings_sections('auto_sri');
+                    submit_button('Save Settings');
+                    ?>
+                </form>
+
+                <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 700px;">
+                    <h3 style="margin-top: 0;"><?php esc_html_e('Settings are unlocked on this WordPress instance', 'auto-sri'); ?></h3>
+                    <p><?php esc_html_e('You will not need to pay again on this same instance.', 'auto-sri'); ?></p>
+                </div>
+            <?php else : ?>
+                <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 700px;">
+                    <h3 style="margin-top: 0;"><?php esc_html_e('Settings are locked', 'auto-sri'); ?></h3>
+                    <p><?php esc_html_e('To enable exclusions settings, complete payment and then set one constant in wp-config.php.', 'auto-sri'); ?></p>
+                    <p>
+                        <a href="<?php echo esc_attr(self::PAYMENT_URL); ?>" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #0070ba; color: #fff; font-weight: 600; font-size: 15px; padding: 10px 22px; border-radius: 4px; text-decoration: none;">
+                            <?php esc_html_e('Pay $5', 'auto-sri'); ?>
+                        </a>
+                    </p>
+                    <p style="margin: 12px 0 0;"><code>define('AUTO_SRI_SETTINGS_UNLOCKED', true);</code></p>
+                    <p style="margin: 8px 0 0;"><small><?php esc_html_e('Alternative owner bypass: AUTO_SRI_BYPASS_PAYWALL.', 'auto-sri'); ?></small></p>
+                </div>
+            <?php endif; ?>
         </div>
         <?php
+    }
+
+    private static function is_settings_unlocked() {
+        if (defined('AUTO_SRI_SETTINGS_UNLOCKED') && AUTO_SRI_SETTINGS_UNLOCKED) {
+            return true;
+        }
+
+        if (defined('AUTO_SRI_BYPASS_PAYWALL') && AUTO_SRI_BYPASS_PAYWALL) {
+            return true;
+        }
+
+        $bypass_from_filter = false;
+        if (function_exists('apply_filters')) {
+            $bypass_from_filter = (bool) apply_filters('auto_sri_bypass_paywall', false);
+        }
+
+        if ($bypass_from_filter) {
+            return true;
+        }
+
+        return (bool) get_option(self::SETTINGS_UNLOCK_OPTION, 0);
     }
 
     /**
