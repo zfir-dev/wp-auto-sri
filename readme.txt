@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 2.3
+Stable tag: 2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,9 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 2.4 =
+* Version bump to 2.4
+
 = 2.3 =
 * Version bump to 2.3
 
@@ -141,5 +144,5 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Upgrade Notice ==
 
-= 2.3 =
-Version bump to 2.3.
+= 2.4 =
+Version bump to 2.4.
