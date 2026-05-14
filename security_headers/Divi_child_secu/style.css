@@ -1,0 +1,44 @@
+/*
+Theme Name: Divi Child
+Theme URI: https://www.elegantthemes.com/gallery/divi/
+Description: makes easier to correct CSS in certain cases linked to security header side effects
+Author: a poor, lonely sys-admin (and sadely non dev)
+Author URI: sans
+Template: Divi
+Version: 1.0.0
+*/
+
+/********************************** to modify as needed
+/* to correct iframe "like-master" */
+#like-master {
+    display: none;
+}
+
+.center {
+    text-align: center;
+}
+.underline {
+    text-decoration: underline;
+}
+.img_article_header {
+    width: 271px;
+    height: auto;
+    align: center;
+}
+.notabenewarn {
+    color: #993300;
+}
+
+/* enforce text's color */
+body, p, h1, h2, h3, h4, h5, h6 {
+    color: #666666;
+}
+/* enforce link's color */
+a[href] {
+    color: #005e42;
+}
+/* add emoji before a link */
+.linkemoji::before {
+    content: "🔗";
+}
+

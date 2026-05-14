@@ -1,0 +1,3 @@
+- this directory must be copied in wp-content/theme
+- modify 'style.css' to declare which theme is the parent (l.7, theme: $name)
+- for the next version of auto-SRI, maybe change 'screenshot.png'
