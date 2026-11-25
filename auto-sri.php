@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Auto SRI
  * Description: Automatically adds Subresource Integrity (SRI) to external scripts and styles, while safely excluding dynamic content such as Google reCAPTCHA and Google Fonts.
- * Version: 2.3
+ * Version: 2.4
  * Author: Zafir Sk Heerah
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -10,7 +10,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('AUTO_SRI_VERSION', '2.3');
+define('AUTO_SRI_VERSION', '2.4');
 define('AUTO_SRI_FILE', __FILE__);
 
 require_once plugin_dir_path(__FILE__) . 'includes/class-auto-sri.php';

@@ -3,7 +3,7 @@ Contributors: Zafir Sk Heerah
 Tags: security, sri, integrity, csp, performance
 Requires at least: 5.0
 Tested up to: 6.8
-Stable tag: 2.3
+Stable tag: 2.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,11 @@ For excluded domains, you should whitelist them in your CSP.
 
 == Changelog ==
 
+= 2.4 =
+* Added developer hooks so add-ons can extend Auto SRI: `auto_sri_hash_algorithm`, `auto_sri_pre_get_hash`, `auto_sri_hash_computed`, `auto_sri_is_excluded` and `auto_sri_settings_page_after_form`
+* Cached hashes are recomputed if the hash algorithm changes
+* Added a small, dismissible link to the optional Auto SRI Pro add-on on the settings page
+
 = 2.3 =
 * Version bump to 2.3
 
@@ -140,6 +145,9 @@ For excluded domains, you should whitelist them in your CSP.
 * Stable, safe version for production use
 
 == Upgrade Notice ==
+
+= 2.4 =
+Adds developer hooks for add-ons. No changes to how SRI is applied by default.
 
 = 2.3 =
 Version bump to 2.3.
