@@ -19,6 +19,10 @@ class AutoSRI {
         $plugin_basename = plugin_basename(dirname(__DIR__) . '/auto-sri.php');
         add_filter("plugin_action_links_" . $plugin_basename, [__CLASS__, 'add_plugin_action_links']);
 
+        // One-time notice for sites that saved custom exclusions before 2.4
+        add_action('admin_notices', [__CLASS__, 'legacy_exclusions_notice']);
+        add_action('admin_post_auto_sri_dismiss_legacy_notice', [__CLASS__, 'dismiss_legacy_notice']);
+
         // Hide the Auto SRI Pro card on the settings page
         add_action('admin_post_auto_sri_dismiss_pro_link', [__CLASS__, 'dismiss_pro_link']);
     }
@@ -310,6 +314,75 @@ class AutoSRI {
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Custom exclusions saved in the old settings textarea (before 2.4).
+     * Read only to tell the site owner about them; Auto SRI no longer applies them.
+     *
+     * @return string[]
+     */
+    public static function get_legacy_exclusions() {
+        $saved = get_option('auto_sri_exclusions', '');
+        if (!is_string($saved)) {
+            return [];
+        }
+        return array_values(array_filter(array_map('trim', explode("\n", $saved)), 'strlen'));
+    }
+
+    /**
+     * Dismissible notice, on the Plugins screen and this plugin's settings page only,
+     * for sites whose saved exclusions are no longer applied. Not shown while
+     * Auto SRI Pro is licensed (it applies them).
+     */
+    public static function legacy_exclusions_notice() {
+        if (!current_user_can('manage_options') || !self::show_pro_ads()) {
+            return;
+        }
+        $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+        if (!$screen || !in_array($screen->id, ['plugins', 'settings_page_auto-sri'], true)) {
+            return;
+        }
+        $legacy = self::get_legacy_exclusions();
+        if (!$legacy || get_user_meta(get_current_user_id(), 'auto_sri_legacy_notice_dismissed', true)) {
+            return;
+        }
+
+        $dismiss_url = wp_nonce_url(admin_url('admin-post.php?action=auto_sri_dismiss_legacy_notice'), 'auto_sri_dismiss_legacy_notice');
+        ?>
+        <div class="notice notice-warning">
+            <p><strong><?php esc_html_e('Auto SRI: your custom excluded URLs are no longer applied.', 'auto-sri'); ?></strong></p>
+            <p><?php esc_html_e('Since version 2.4, custom URL exclusions are part of Auto SRI Pro. Your saved list is kept, and Auto SRI Pro picks it up automatically:', 'auto-sri'); ?></p>
+            <ul style="list-style: disc; padding-left: 20px;">
+                <?php foreach (array_slice($legacy, 0, 20) as $line) : ?>
+                    <li><code><?php echo esc_html($line); ?></code></li>
+                <?php endforeach; ?>
+                <?php if (count($legacy) > 20) : ?>
+                    <li><?php echo esc_html(sprintf(__('and %d more', 'auto-sri'), count($legacy) - 20)); ?></li>
+                <?php endif; ?>
+            </ul>
+            <p><?php esc_html_e('Without Pro, these files get integrity hashes again. If one of them changes on every request, browsers may block it. Developers can keep excluding them with the auto_sri_excluded_urls filter.', 'auto-sri'); ?></p>
+            <p>
+                <a class="button button-primary" href="<?php echo esc_url(self::get_pro_url()); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Get Auto SRI Pro', 'auto-sri'); ?></a>
+                <a class="button" href="<?php echo esc_url($dismiss_url); ?>"><?php esc_html_e('Dismiss', 'auto-sri'); ?></a>
+            </p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Remember that the current user dismissed the legacy exclusions notice.
+     */
+    public static function dismiss_legacy_notice() {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to do this.', 'auto-sri'), 403);
+        }
+        check_admin_referer('auto_sri_dismiss_legacy_notice');
+
+        update_user_meta(get_current_user_id(), 'auto_sri_legacy_notice_dismissed', 1);
+
+        wp_safe_redirect(wp_get_referer() ? wp_get_referer() : admin_url('plugins.php'));
+        exit;
     }
 
     /**
