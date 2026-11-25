@@ -19,6 +19,9 @@ class AutoSRI {
         // Settings Link in Plugins List
         $plugin_basename = plugin_basename(dirname(__DIR__) . '/auto-sri.php');
         add_filter("plugin_action_links_" . $plugin_basename, [__CLASS__, 'add_plugin_action_links']);
+
+        // Dismiss the optional Pro link on the settings page
+        add_action('admin_post_auto_sri_dismiss_pro_link', [__CLASS__, 'dismiss_pro_link']);
     }
 
     /**
@@ -310,6 +313,8 @@ class AutoSRI {
              * Fires after the Auto SRI settings form, so add-ons can add their own content.
              */
             do_action('auto_sri_settings_page_after_form');
+
+            self::render_pro_link();
             ?>
             <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 600px;">
                 <h3 style="margin-top: 0;"><?php esc_html_e('Like Auto SRI? Help keep it that way!', 'auto-sri'); ?></h3>
@@ -322,6 +327,45 @@ class AutoSRI {
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Small, dismissible link to the optional Pro add-on. Shown only on this
+     * settings page; every free feature works without it.
+     */
+    public static function render_pro_link() {
+        if (!apply_filters('auto_sri_show_pro_link', true)) {
+            return;
+        }
+        if (get_user_meta(get_current_user_id(), 'auto_sri_pro_link_dismissed', true)) {
+            return;
+        }
+
+        $pro_url     = apply_filters('auto_sri_pro_url', 'https://zfir.lemonsqueezy.com/');
+        $dismiss_url = wp_nonce_url(admin_url('admin-post.php?action=auto_sri_dismiss_pro_link'), 'auto_sri_dismiss_pro_link');
+        ?>
+        <p class="description" style="margin-top: 20px;">
+            <?php esc_html_e('Want email alerts when a CDN file changes, scheduled re-checks and SHA-512 hashes?', 'auto-sri'); ?>
+            <a href="<?php echo esc_url($pro_url); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Auto SRI Pro', 'auto-sri'); ?></a>
+            &middot;
+            <a href="<?php echo esc_url($dismiss_url); ?>"><?php esc_html_e('Dismiss', 'auto-sri'); ?></a>
+        </p>
+        <?php
+    }
+
+    /**
+     * Remember that the current user dismissed the Pro link.
+     */
+    public static function dismiss_pro_link() {
+        if (!current_user_can('manage_options')) {
+            wp_die(esc_html__('You do not have permission to do this.', 'auto-sri'), 403);
+        }
+        check_admin_referer('auto_sri_dismiss_pro_link');
+
+        update_user_meta(get_current_user_id(), 'auto_sri_pro_link_dismissed', 1);
+
+        wp_safe_redirect(admin_url('options-general.php?page=auto-sri'));
+        exit;
     }
 
     /**
