@@ -15,21 +15,43 @@ define('PHPUNIT_RUNNING', true);
 // 2. Fake WordPress function stubs
 // -------------------------------------------------------------
 
-if (!function_exists('add_action')) {
-    function add_action($hook, $callback, $priority = 10, $args = 1) {
-        // No-op for PHPUnit
-    }
-}
+// Minimal hook registry so tests can attach filters and actions.
+$GLOBALS['__mock_hooks'] = [];
 
 if (!function_exists('add_filter')) {
     function add_filter($hook, $callback, $priority = 10, $args = 1) {
-        // No-op for PHPUnit
+        $GLOBALS['__mock_hooks'][$hook][] = [$callback, $args];
+        return true;
+    }
+}
+
+if (!function_exists('add_action')) {
+    function add_action($hook, $callback, $priority = 10, $args = 1) {
+        return add_filter($hook, $callback, $priority, $args);
     }
 }
 
 if (!function_exists('apply_filters')) {
-    function apply_filters($hook, $value) {
+    function apply_filters($hook, $value, ...$rest) {
+        foreach ($GLOBALS['__mock_hooks'][$hook] ?? [] as [$callback, $args]) {
+            $value = call_user_func_array($callback, array_slice(array_merge([$value], $rest), 0, $args));
+        }
         return $value;
+    }
+}
+
+if (!function_exists('do_action')) {
+    function do_action($hook, ...$rest) {
+        foreach ($GLOBALS['__mock_hooks'][$hook] ?? [] as [$callback, $args]) {
+            call_user_func_array($callback, array_slice($rest, 0, $args));
+        }
+    }
+}
+
+if (!function_exists('remove_all_filters')) {
+    function remove_all_filters($hook) {
+        unset($GLOBALS['__mock_hooks'][$hook]);
+        return true;
     }
 }
 
