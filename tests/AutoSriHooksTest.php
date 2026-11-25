@@ -6,7 +6,7 @@ class AutoSriHooksTest extends TestCase {
 
     protected function setUp(): void {
         $GLOBALS['__mock_options'] = [];
-        foreach (['auto_sri_hash_algorithm', 'auto_sri_pre_get_hash', 'auto_sri_hash_computed', 'auto_sri_is_excluded'] as $hook) {
+        foreach (['auto_sri_hash_algorithm', 'auto_sri_pre_get_hash', 'auto_sri_hash_computed', 'auto_sri_is_excluded', 'auto_sri_enabled', 'auto_sri_rewrite_html', 'auto_sri_builtin_exclusions'] as $hook) {
             remove_all_filters($hook);
         }
     }
@@ -74,6 +74,37 @@ class AutoSriHooksTest extends TestCase {
 
         $this->assertTrue(AutoSRI::is_excluded('https://cdn.example.com/skip-me.js'));
         $this->assertFalse(AutoSRI::is_excluded('https://cdn.example.com/keep-me.js'));
+        $this->assertTrue(AutoSRI::is_excluded('https://www.google.com/recaptcha/api.js'));
+    }
+
+    public function test_enabled_filter_switches_sri_off() {
+        $tag = '<script src="https://cdn.example.com/off.js"></script>';
+        add_filter('auto_sri_enabled', function () { return false; });
+
+        $this->assertFalse(AutoSRI::is_enabled());
+        $this->assertSame($tag, AutoSRI::inject_sri($tag, 'off', 'https://cdn.example.com/off.js'));
+    }
+
+    public function test_rewrite_html_filter_skips_output_buffer() {
+        $level = ob_get_level();
+        add_filter('auto_sri_rewrite_html', function () { return false; });
+        AutoSRI::start_buffer();
+        $this->assertSame($level, ob_get_level());
+
+        remove_all_filters('auto_sri_rewrite_html');
+        AutoSRI::start_buffer();
+        $this->assertSame($level + 1, ob_get_level());
+        ob_end_clean();
+    }
+
+    public function test_builtin_exclusions_are_filterable() {
+        $this->assertContains('fonts.googleapis.com', AutoSRI::get_builtin_exclusions());
+        $this->assertTrue(AutoSRI::is_excluded('https://FONTS.googleapis.com/css?family=Roboto'));
+
+        add_filter('auto_sri_builtin_exclusions', function ($patterns) {
+            return array_values(array_diff($patterns, ['fonts.googleapis.com']));
+        });
+        $this->assertFalse(AutoSRI::is_excluded('https://fonts.googleapis.com/css?family=Roboto'));
         $this->assertTrue(AutoSRI::is_excluded('https://www.google.com/recaptcha/api.js'));
     }
 }

@@ -27,11 +27,19 @@ class AutoSriAdminTest extends TestCase {
         $this->assertStringNotContainsString('<form', $html);
     }
 
+    public function test_info_page_explains_fixed_defaults() {
+        $html = $this->render(['AutoSRI', 'settings_page_html']);
+
+        $this->assertStringContainsString('It has no settings', $html);
+        $this->assertStringContainsString('SHA-384', $html);
+        $this->assertStringContainsString('Google reCAPTCHA', $html);
+    }
+
     public function test_settings_page_advertises_pro() {
         $html = $this->render(['AutoSRI', 'settings_page_html']);
 
         $this->assertStringContainsString('Auto SRI Pro', $html);
-        foreach (['Custom URLs', 'Scheduled re-checks and email alerts', 'Asset manager', 'Hash algorithm choice', 'WP-CLI commands'] as $feature) {
+        foreach (['All the settings', 'Switches', 'Custom URLs', 'Scheduled re-checks and email alerts', 'Asset manager', 'Hash algorithm choice', 'WP-CLI commands'] as $feature) {
             $this->assertStringContainsString($feature, $html);
         }
         $this->assertStringContainsString('href="https://zfir.lemonsqueezy.com/"', $html);
@@ -51,7 +59,7 @@ class AutoSriAdminTest extends TestCase {
         $this->assertSame('', trim($this->render(['AutoSRI', 'render_pro_card'])));
         $links = AutoSRI::add_plugin_action_links([]);
         $this->assertCount(1, $links);
-        $this->assertStringContainsString('Settings', $links[0]);
+        $this->assertStringContainsString('About', $links[0]);
     }
 
     public function test_card_hidden_after_dismissal() {
@@ -62,7 +70,7 @@ class AutoSriAdminTest extends TestCase {
     public function test_plugin_row_upgrade_link() {
         $links = AutoSRI::add_plugin_action_links(['deactivate' => '<a>Deactivate</a>']);
 
-        $this->assertStringContainsString('Settings', $links[0]);
+        $this->assertStringContainsString('About', $links[0]);
         $this->assertStringContainsString('Upgrade to Pro', end($links));
         $this->assertStringContainsString('https://zfir.lemonsqueezy.com/', end($links));
     }
