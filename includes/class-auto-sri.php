@@ -14,7 +14,6 @@ class AutoSRI {
 
         // Admin Settings
         add_action('admin_menu', [__CLASS__, 'add_admin_menu']);
-        add_action('admin_init', [__CLASS__, 'settings_init']);
 
         // Settings Link in Plugins List
         $plugin_basename = plugin_basename(dirname(__DIR__) . '/auto-sri.php');
@@ -211,23 +210,45 @@ class AutoSRI {
         }
 
         // ============================
-        // USER DEFINED EXCLUSIONS
+        // EXTRA EXCLUSIONS (via filter)
         // ============================
-        $user_exclusions = get_option('auto_sri_exclusions', '');
-        if (!empty($user_exclusions)) {
-            $lines = explode("\n", $user_exclusions);
-            foreach ($lines as $line) {
-                $line = trim($line);
-                if (empty($line)) continue;
-
-                // Simple substring match
-                if (stripos($url, $line) !== false) {
-                    return true;
-                }
+        foreach (self::get_excluded_urls() as $pattern) {
+            // Simple substring match
+            if (stripos($url, $pattern) !== false) {
+                return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Extra exclusion patterns (domains, filenames or URLs, matched as substrings).
+     *
+     * Auto SRI has no settings for these since 2.4. Auto SRI Pro provides a
+     * "Custom URLs" setting through this filter, and developers can add
+     * their own patterns in code.
+     *
+     * @return string[]
+     */
+    public static function get_excluded_urls() {
+        /**
+         * Filters extra URL patterns to exclude from SRI.
+         *
+         * @param string[] $patterns Default empty.
+         */
+        $patterns = apply_filters('auto_sri_excluded_urls', []);
+        if (!is_array($patterns)) {
+            return [];
+        }
+
+        $clean = [];
+        foreach ($patterns as $pattern) {
+            if (is_scalar($pattern) && '' !== trim((string) $pattern)) {
+                $clean[] = trim((string) $pattern);
+            }
+        }
+        return $clean;
     }
 
     /**
@@ -241,45 +262,6 @@ class AutoSRI {
             'auto-sri',
             [__CLASS__, 'settings_page_html']
         );
-    }
-
-    /**
-     * Register Settings
-     */
-    public static function settings_init() {
-        register_setting('auto_sri', 'auto_sri_exclusions');
-
-        add_settings_section(
-            'auto_sri_section',
-            __('Exclusions', 'auto-sri'),
-            null,
-            'auto_sri'
-        );
-
-        add_settings_field(
-            'auto_sri_exclusions',
-            __('Excluded URLs (one per line)', 'auto-sri'),
-            [__CLASS__, 'exclusions_callback'],
-            'auto_sri',
-            'auto_sri_section'
-        );
-    }
-
-    /**
-     * Callback for the exclusions field
-     */
-    public static function exclusions_callback() {
-        $value = get_option('auto_sri_exclusions', '');
-        ?>
-        <textarea name="auto_sri_exclusions" rows="10" cols="50" class="large-text code"><?php echo esc_textarea($value); ?></textarea>
-        <p class="description">
-            Enter domains, filenames, or full URLs to exclude.<br>
-            <strong>Important:</strong> Enter each exclusion on a new line.<br>
-            For example:<br>
-            <code>ads.google.com</code><br>
-            <code>my-dynamic-script.js</code>
-        </p>
-        <?php
     }
 
     /**
@@ -301,16 +283,12 @@ class AutoSRI {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <form action="options.php" method="post">
-                <?php
-                settings_fields('auto_sri');
-                do_settings_sections('auto_sri');
-                submit_button('Save Settings');
-                ?>
-            </form>
+            <p><?php esc_html_e('Auto SRI adds Subresource Integrity hashes to external scripts and stylesheets automatically. There is nothing to configure.', 'auto-sri'); ?></p>
+            <p><?php esc_html_e('Built-in exclusions: Google reCAPTCHA, Google Fonts, WordPress.com widgets and concatenated /_static/ resources.', 'auto-sri'); ?></p>
             <?php
             /**
-             * Fires after the Auto SRI settings form, so add-ons can add their own content.
+             * Fires on the Auto SRI settings page, so add-ons can add their own content.
+             * (The name is kept from when this page had a settings form.)
              */
             do_action('auto_sri_settings_page_after_form');
 
