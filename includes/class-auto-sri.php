@@ -35,7 +35,17 @@ class AutoSRI {
         if (is_admin()) {
             return;
         }
-        
+
+        /**
+         * Filters whether raw <script>/<link> tags in the page HTML are rewritten
+         * (output buffer). Enqueued assets are handled either way.
+         *
+         * @param bool $rewrite Default true.
+         */
+        if (!self::is_enabled() || !apply_filters('auto_sri_rewrite_html', true)) {
+            return;
+        }
+
         ob_start([__CLASS__, 'rewrite_output']);
     }
 
@@ -121,8 +131,8 @@ class AutoSRI {
     // phpcs:enable WordPress.WP.EnqueuedResources.NonEnqueuedScript
     public static function inject_sri($tag, $handle, $src, $media = null) {
 
-        // Skip if in admin panel
-        if (is_admin()) {
+        // Skip if in admin panel or switched off
+        if (is_admin() || !self::is_enabled()) {
             return $tag;
         }
 
@@ -181,36 +191,50 @@ class AutoSRI {
     }
 
     /**
-     * Built-in and user-defined exclusions.
+     * Whether Auto SRI adds integrity attributes at all.
+     */
+    public static function is_enabled() {
+        /**
+         * Filters whether Auto SRI is active on the front end.
+         *
+         * @param bool $enabled Default true.
+         */
+        return (bool) apply_filters('auto_sri_enabled', true);
+    }
+
+    /**
+     * Providers whose files change on every request and can't use SRI.
+     * Matched case-insensitively as substrings of the asset URL.
+     *
+     * @return string[]
+     */
+    public static function get_builtin_exclusions() {
+        $defaults = [
+            'google.com/recaptcha',   // Google reCAPTCHA
+            'gstatic.com/recaptcha',  // reCAPTCHA subresources
+            'fonts.googleapis.com',   // Google Fonts CSS
+            'fonts.gstatic.com',      // Google Fonts files
+            'widgets.wp.com',         // WordPress.com widgets
+            '/_static/??',            // Dynamic concatenated resources
+        ];
+
+        /**
+         * Filters the built-in exclusions.
+         *
+         * @param string[] $patterns
+         */
+        $patterns = apply_filters('auto_sri_builtin_exclusions', $defaults);
+        return is_array($patterns) ? array_values(array_filter(array_map('strval', array_filter($patterns, 'is_scalar')), 'strlen')) : $defaults;
+    }
+
+    /**
+     * Built-in exclusions plus extra patterns from the auto_sri_excluded_urls filter.
      */
     private static function is_excluded_by_default($url) {
-        // ============================
-        // GOOGLE EXCLUSIONS (Hardcoded)
-        // ============================
-
-        // 1. Google reCAPTCHA
-        if (preg_match('#google\.com/recaptcha#i', $url)) {
-            return true;
-        }
-
-        // 2. Google Fonts CSS
-        if (strpos($url, 'fonts.googleapis.com') !== false) {
-            return true;
-        }
-
-        // 3. Google reCAPTCHA subresources / specific font files
-        if (strpos($url, 'gstatic.com/recaptcha') !== false || strpos($url, 'fonts.gstatic.com') !== false) {
-            return true;
-        }
-
-        // 4. WordPress.com widgets
-        if (strpos($url, 'widgets.wp.com') !== false) {
-            return true;
-        }
-
-        // 5. Dynamic concatenated resources
-        if (strpos($url, '/_static/??') !== false) {
-            return true;
+        foreach (self::get_builtin_exclusions() as $pattern) {
+            if (stripos($url, $pattern) !== false) {
+                return true;
+            }
         }
 
         // ============================
