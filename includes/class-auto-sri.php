@@ -19,7 +19,7 @@ class AutoSRI {
         $plugin_basename = plugin_basename(dirname(__DIR__) . '/auto-sri.php');
         add_filter("plugin_action_links_" . $plugin_basename, [__CLASS__, 'add_plugin_action_links']);
 
-        // Dismiss the optional Pro link on the settings page
+        // Hide the Auto SRI Pro card on the settings page
         add_action('admin_post_auto_sri_dismiss_pro_link', [__CLASS__, 'dismiss_pro_link']);
     }
 
@@ -270,6 +270,11 @@ class AutoSRI {
     public static function add_plugin_action_links($links) {
         $settings_link = '<a href="options-general.php?page=auto-sri">Settings</a>';
         array_unshift($links, $settings_link);
+
+        if (self::show_pro_ads()) {
+            $links[] = '<a href="' . esc_url(self::get_pro_url()) . '" target="_blank" rel="noopener noreferrer" style="font-weight:600;">' . esc_html__('Upgrade to Pro', 'auto-sri') . '</a>';
+        }
+
         return $links;
     }
 
@@ -292,7 +297,7 @@ class AutoSRI {
              */
             do_action('auto_sri_settings_page_after_form');
 
-            self::render_pro_link();
+            self::render_pro_card();
             ?>
             <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 600px;">
                 <h3 style="margin-top: 0;"><?php esc_html_e('Like Auto SRI? Help keep it that way!', 'auto-sri'); ?></h3>
@@ -308,31 +313,63 @@ class AutoSRI {
     }
 
     /**
-     * Small, dismissible link to the optional Pro add-on. Shown only on this
-     * settings page; every free feature works without it.
+     * Whether to show Auto SRI Pro ads. Auto SRI Pro returns false while it is licensed.
      */
-    public static function render_pro_link() {
-        if (!apply_filters('auto_sri_show_pro_link', true)) {
+    public static function show_pro_ads() {
+        return (bool) apply_filters('auto_sri_show_pro_link', true);
+    }
+
+    /**
+     * Where "Get Pro" links point.
+     */
+    public static function get_pro_url() {
+        return (string) apply_filters('auto_sri_pro_url', 'https://zfir.lemonsqueezy.com/');
+    }
+
+    /**
+     * Card describing the optional Auto SRI Pro add-on. Shown only on this
+     * settings page, hidden once Pro is licensed, and dismissible per user.
+     * Nothing in Auto SRI is locked behind it.
+     */
+    public static function render_pro_card() {
+        if (!self::show_pro_ads()) {
             return;
         }
         if (get_user_meta(get_current_user_id(), 'auto_sri_pro_link_dismissed', true)) {
             return;
         }
 
-        $pro_url     = apply_filters('auto_sri_pro_url', 'https://zfir.lemonsqueezy.com/');
         $dismiss_url = wp_nonce_url(admin_url('admin-post.php?action=auto_sri_dismiss_pro_link'), 'auto_sri_dismiss_pro_link');
+        $features    = [
+            [__('Custom URLs', 'auto-sri'), __('exclude your own domains, files or URLs from SRI.', 'auto-sri')],
+            [__('Scheduled re-checks and email alerts', 'auto-sri'), __('know when a CDN file changes, and keep the old hash until you approve the new file.', 'auto-sri')],
+            [__('Asset manager', 'auto-sri'), __('every external file with its hash and status, plus re-check, accept and exclude actions.', 'auto-sri')],
+            [__('Hash algorithm choice', 'auto-sri'), __('SHA-256, SHA-384 or SHA-512.', 'auto-sri')],
+            [__('WP-CLI commands', 'auto-sri'), __('manage the license and assets from the command line.', 'auto-sri')],
+        ];
         ?>
-        <p class="description" style="margin-top: 20px;">
-            <?php esc_html_e('Want email alerts when a CDN file changes, scheduled re-checks and SHA-512 hashes?', 'auto-sri'); ?>
-            <a href="<?php echo esc_url($pro_url); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Auto SRI Pro', 'auto-sri'); ?></a>
-            &middot;
-            <a href="<?php echo esc_url($dismiss_url); ?>"><?php esc_html_e('Dismiss', 'auto-sri'); ?></a>
-        </p>
+        <div class="auto-sri-pro-card" style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; border-left: 4px solid #2271b1; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 600px;">
+            <h2 style="margin-top: 0;"><?php esc_html_e('Auto SRI Pro', 'auto-sri'); ?></h2>
+            <p><?php esc_html_e('An optional paid add-on for sites that want more control. Auto SRI keeps working without it.', 'auto-sri'); ?></p>
+            <ul style="list-style: disc; padding-left: 20px;">
+                <?php foreach ($features as $feature) : ?>
+                    <li><strong><?php echo esc_html($feature[0]); ?></strong> &ndash; <?php echo esc_html($feature[1]); ?></li>
+                <?php endforeach; ?>
+            </ul>
+            <p class="description" style="margin-bottom: 4px;"><?php esc_html_e('Preview of the Custom URLs setting in Auto SRI Pro (not available in the free plugin):', 'auto-sri'); ?></p>
+            <div aria-hidden="true" style="font-family: Consolas, Monaco, monospace; font-size: 12px; line-height: 1.6; background: #f6f7f7; border: 1px dashed #c3c4c7; border-radius: 4px; padding: 8px 12px; color: #50575e; user-select: none;">
+                ads.example.com<br>my-dynamic-script.js<br>https://cdn.example.com/widget.js
+            </div>
+            <p style="margin-bottom: 0; margin-top: 16px;">
+                <a class="button button-primary" href="<?php echo esc_url(self::get_pro_url()); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Get Auto SRI Pro', 'auto-sri'); ?></a>
+                <a href="<?php echo esc_url($dismiss_url); ?>" style="margin-left: 12px;"><?php esc_html_e('Hide this', 'auto-sri'); ?></a>
+            </p>
+        </div>
         <?php
     }
 
     /**
-     * Remember that the current user dismissed the Pro link.
+     * Remember that the current user hid the Pro card.
      */
     public static function dismiss_pro_link() {
         if (!current_user_can('manage_options')) {
