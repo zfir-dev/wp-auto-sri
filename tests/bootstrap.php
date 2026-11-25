@@ -178,6 +178,37 @@ if (!function_exists('plugin_basename')) {
     }
 }
 
+$GLOBALS['__mock_user_meta'] = [];
+$GLOBALS['__mock_screen'] = 'plugins';
+
+if (!function_exists('get_current_user_id')) {
+    function get_current_user_id() { return 1; }
+}
+if (!function_exists('get_user_meta')) {
+    function get_user_meta($user_id, $key = '', $single = false) { return $GLOBALS['__mock_user_meta'][$key] ?? ''; }
+}
+if (!function_exists('get_current_screen')) {
+    function get_current_screen() { return (object) ['id' => $GLOBALS['__mock_screen']]; }
+}
+if (!function_exists('admin_url')) {
+    function admin_url($path = '') { return 'https://example.com/wp-admin/' . $path; }
+}
+if (!function_exists('wp_nonce_url')) {
+    function wp_nonce_url($url, $action = -1) { return $url . '&_wpnonce=test'; }
+}
+if (!function_exists('esc_url')) {
+    function esc_url($url) { return htmlspecialchars($url, ENT_QUOTES); }
+}
+if (!function_exists('esc_html__')) {
+    function esc_html__($text, $domain = 'default') { return htmlspecialchars($text); }
+}
+if (!function_exists('esc_html_e')) {
+    function esc_html_e($text, $domain = 'default') { echo htmlspecialchars($text); }
+}
+if (!function_exists('__return_false')) {
+    function __return_false() { return false; }
+}
+
 // -------------------------------------------------------------
 // 3. Load Composer autoloader
 // -------------------------------------------------------------
