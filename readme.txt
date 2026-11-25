@@ -72,6 +72,13 @@ Scripts from Google reCAPTCHA, Google Fonts, wsimg, ywxi, and other dynamic sour
 
 This plugin intelligently detects those sources and safely skips them.
 
+= How do I exclude my own scripts or domains? =
+Since version 2.4, the Custom URLs setting is part of the optional Auto SRI Pro add-on. Developers can also exclude URLs in code:
+
+`add_filter( 'auto_sri_excluded_urls', function ( $patterns ) { $patterns[] = 'my-dynamic-script.js'; return $patterns; } );`
+
+Each pattern is matched as a substring of the script or stylesheet URL.
+
 = Does this affect performance? =  
 No. SRI hashes are computed once and stored in the WordPress options table.
 
@@ -86,9 +93,11 @@ For excluded domains, you should whitelist them in your CSP.
 == Changelog ==
 
 = 2.4 =
+* Custom excluded URLs moved to the optional Auto SRI Pro add-on. The settings textarea is removed and the free plugin no longer applies the saved list. The saved list is kept in the database, Auto SRI Pro imports it automatically, and a dismissible notice lists it for sites that had one
+* Added the `auto_sri_excluded_urls` filter so developers can still exclude URLs in code
 * Added developer hooks so add-ons can extend Auto SRI: `auto_sri_hash_algorithm`, `auto_sri_pre_get_hash`, `auto_sri_hash_computed`, `auto_sri_is_excluded` and `auto_sri_settings_page_after_form`
 * Cached hashes are recomputed if the hash algorithm changes
-* Added a small, dismissible link to the optional Auto SRI Pro add-on on the settings page
+* Added an Auto SRI Pro card on the settings page and an "Upgrade to Pro" link in the plugin list (hidden once Pro is active)
 
 = 2.3 =
 * Version bump to 2.3
@@ -147,7 +156,7 @@ For excluded domains, you should whitelist them in your CSP.
 == Upgrade Notice ==
 
 = 2.4 =
-Adds developer hooks for add-ons. No changes to how SRI is applied by default.
+Custom excluded URLs are no longer applied by the free plugin; they move to Auto SRI Pro, which imports your saved list. Developers can use the auto_sri_excluded_urls filter instead. Built-in exclusions are unchanged.
 
 = 2.3 =
 Version bump to 2.3.
