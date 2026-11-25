@@ -284,8 +284,8 @@ class AutoSRI {
      */
     public static function add_admin_menu() {
         add_options_page(
-            'Auto SRI Settings',
-            'Auto SRI',
+            __('Auto SRI', 'auto-sri'),
+            __('Auto SRI', 'auto-sri'),
             'manage_options',
             'auto-sri',
             [__CLASS__, 'settings_page_html']
@@ -293,10 +293,10 @@ class AutoSRI {
     }
 
     /**
-     * Add Settings Link to Plugins Page
+     * Add About link to Plugins Page
      */
     public static function add_plugin_action_links($links) {
-        $settings_link = '<a href="options-general.php?page=auto-sri">Settings</a>';
+        $settings_link = '<a href="options-general.php?page=auto-sri">' . esc_html__('About', 'auto-sri') . '</a>';
         array_unshift($links, $settings_link);
 
         if (self::show_pro_ads()) {
@@ -307,7 +307,7 @@ class AutoSRI {
     }
 
     /**
-     * Settings Page HTML
+     * Info page (Auto SRI has no settings).
      */
     public static function settings_page_html() {
         if (!current_user_can('manage_options')) {
@@ -316,11 +316,19 @@ class AutoSRI {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
-            <p><?php esc_html_e('Auto SRI adds Subresource Integrity hashes to external scripts and stylesheets automatically. There is nothing to configure.', 'auto-sri'); ?></p>
-            <p><?php esc_html_e('Built-in exclusions: Google reCAPTCHA, Google Fonts, WordPress.com widgets and concatenated /_static/ resources.', 'auto-sri'); ?></p>
+            <div style="max-width: 600px;">
+                <p><?php esc_html_e('Auto SRI is working. It has no settings: it adds Subresource Integrity (SRI) to external scripts and stylesheets automatically, with fixed, safe defaults:', 'auto-sri'); ?></p>
+                <ul style="list-style: disc; padding-left: 20px;">
+                    <li><?php esc_html_e('SHA-384 hashes with crossorigin="anonymous", computed once and cached.', 'auto-sri'); ?></li>
+                    <li><?php esc_html_e('Covers enqueued assets and script/stylesheet tags in the page HTML.', 'auto-sri'); ?></li>
+                    <li><?php esc_html_e('Skips wp-admin, files from your own site, and tags that already have an integrity attribute.', 'auto-sri'); ?></li>
+                    <li><?php esc_html_e('Skips providers whose files change on every request: Google reCAPTCHA, Google Fonts, WordPress.com widgets and concatenated /_static/ resources.', 'auto-sri'); ?></li>
+                </ul>
+                <p class="description"><?php esc_html_e('Developers can change any of this with filters such as auto_sri_excluded_urls, auto_sri_hash_algorithm and auto_sri_enabled.', 'auto-sri'); ?></p>
+            </div>
             <?php
             /**
-             * Fires on the Auto SRI settings page, so add-ons can add their own content.
+             * Fires on the Auto SRI info page, so add-ons can add their own content.
              * (The name is kept from when this page had a settings form.)
              */
             do_action('auto_sri_settings_page_after_form');
@@ -438,10 +446,12 @@ class AutoSRI {
 
         $dismiss_url = wp_nonce_url(admin_url('admin-post.php?action=auto_sri_dismiss_pro_link'), 'auto_sri_dismiss_pro_link');
         $features    = [
+            [__('All the settings', 'auto-sri'), __('Auto SRI itself has none; Pro lets you choose what is covered and how.', 'auto-sri')],
             [__('Custom URLs', 'auto-sri'), __('exclude your own domains, files or URLs from SRI.', 'auto-sri')],
             [__('Scheduled re-checks and email alerts', 'auto-sri'), __('know when a CDN file changes, and keep the old hash until you approve the new file.', 'auto-sri')],
             [__('Asset manager', 'auto-sri'), __('every external file with its hash and status, plus re-check, accept and exclude actions.', 'auto-sri')],
             [__('Hash algorithm choice', 'auto-sri'), __('SHA-256, SHA-384 or SHA-512.', 'auto-sri')],
+            [__('Switches', 'auto-sri'), __('turn HTML rewriting or the built-in provider exclusions on or off.', 'auto-sri')],
             [__('WP-CLI commands', 'auto-sri'), __('manage the license and assets from the command line.', 'auto-sri')],
         ];
         ?>
