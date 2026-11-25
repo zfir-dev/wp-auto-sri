@@ -10,6 +10,9 @@
 
 if (!defined('ABSPATH')) exit;
 
+define('AUTO_SRI_VERSION', '2.3');
+define('AUTO_SRI_FILE', __FILE__);
+
 require_once plugin_dir_path(__FILE__) . 'includes/class-auto-sri.php';
 
 add_action('plugins_loaded', ['AutoSRI', 'init']);

@@ -163,6 +163,21 @@ class AutoSRI {
      * Check if the URL is excluded
      */
     public static function is_excluded($url) {
+        $excluded = self::is_excluded_by_default($url);
+
+        /**
+         * Filters whether a URL is excluded from SRI.
+         *
+         * @param bool   $excluded Whether the URL is excluded.
+         * @param string $url      The asset URL.
+         */
+        return (bool) apply_filters('auto_sri_is_excluded', $excluded, $url);
+    }
+
+    /**
+     * Built-in and user-defined exclusions.
+     */
+    private static function is_excluded_by_default($url) {
         // ============================
         // GOOGLE EXCLUSIONS (Hardcoded)
         // ============================
@@ -290,6 +305,12 @@ class AutoSRI {
                 submit_button('Save Settings');
                 ?>
             </form>
+            <?php
+            /**
+             * Fires after the Auto SRI settings form, so add-ons can add their own content.
+             */
+            do_action('auto_sri_settings_page_after_form');
+            ?>
             <div style="margin-top: 20px; padding: 20px; background: #fff; border: 1px solid #c3c4c7; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 600px;">
                 <h3 style="margin-top: 0;"><?php esc_html_e('Like Auto SRI? Help keep it that way!', 'auto-sri'); ?></h3>
                 <p><?php esc_html_e('If Auto SRI has been useful to you, consider supporting its development with a $5 contribution. It helps keep the plugin maintained and improved.', 'auto-sri'); ?></p>
@@ -304,14 +325,51 @@ class AutoSRI {
     }
 
     /**
+     * Supported SRI hash algorithms.
+     */
+    public static function get_supported_algorithms() {
+        return ['sha256', 'sha384', 'sha512'];
+    }
+
+    /**
+     * Hash algorithm used for new SRI hashes (SHA-384 by default).
+     */
+    public static function get_hash_algorithm() {
+        /**
+         * Filters the SRI hash algorithm. Must be sha256, sha384 or sha512.
+         *
+         * @param string $algorithm Default 'sha384'.
+         */
+        $algorithm = apply_filters('auto_sri_hash_algorithm', 'sha384');
+
+        return in_array($algorithm, self::get_supported_algorithms(), true) ? $algorithm : 'sha384';
+    }
+
+    /**
      * Compute or get cached SRI hash
      */
     public static function get_sri_hash($url) {
 
+        $algorithm = self::get_hash_algorithm();
+
+        /**
+         * Short-circuits hash lookup. Return a full SRI string (e.g. "sha384-...")
+         * to use it, false to skip SRI for this URL, or null to continue.
+         *
+         * @param string|false|null $pre       Default null.
+         * @param string            $url       The asset URL.
+         * @param string            $algorithm The hash algorithm in use.
+         */
+        $pre = apply_filters('auto_sri_pre_get_hash', null, $url, $algorithm);
+        if (null !== $pre) {
+            return $pre ? (string) $pre : false;
+        }
+
         $cache_key = 'autosri_' . md5($url);
         $cached = get_option($cache_key);
 
-        if ($cached) return $cached;
+        // Reuse the cache only if it was computed with the current algorithm.
+        if ($cached && strpos($cached, $algorithm . '-') === 0) return $cached;
 
         $response = wp_remote_get($url, ['timeout' => 10]);
 
@@ -321,10 +379,19 @@ class AutoSRI {
         if (!$body) return false;
 
         // SHA-384 recommended by browsers
-        $hash = base64_encode(hash('sha384', $body, true));
-        $sri  = "sha384-$hash";
+        $hash = base64_encode(hash($algorithm, $body, true));
+        $sri  = "$algorithm-$hash";
 
         update_option($cache_key, $sri);
+
+        /**
+         * Fires after a new SRI hash has been computed and cached.
+         *
+         * @param string $url       The asset URL.
+         * @param string $sri       The SRI value, e.g. "sha384-...".
+         * @param string $algorithm The hash algorithm used.
+         */
+        do_action('auto_sri_hash_computed', $url, $sri, $algorithm);
 
         return $sri;
     }
