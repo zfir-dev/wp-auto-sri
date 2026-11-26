@@ -15,21 +15,43 @@ define('PHPUNIT_RUNNING', true);
 // 2. Fake WordPress function stubs
 // -------------------------------------------------------------
 
-if (!function_exists('add_action')) {
-    function add_action($hook, $callback, $priority = 10, $args = 1) {
-        // No-op for PHPUnit
-    }
-}
+// Minimal hook registry so tests can attach filters and actions.
+$GLOBALS['__mock_hooks'] = [];
 
 if (!function_exists('add_filter')) {
     function add_filter($hook, $callback, $priority = 10, $args = 1) {
-        // No-op for PHPUnit
+        $GLOBALS['__mock_hooks'][$hook][] = [$callback, $args];
+        return true;
+    }
+}
+
+if (!function_exists('add_action')) {
+    function add_action($hook, $callback, $priority = 10, $args = 1) {
+        return add_filter($hook, $callback, $priority, $args);
     }
 }
 
 if (!function_exists('apply_filters')) {
-    function apply_filters($hook, $value) {
+    function apply_filters($hook, $value, ...$rest) {
+        foreach ($GLOBALS['__mock_hooks'][$hook] ?? [] as [$callback, $args]) {
+            $value = call_user_func_array($callback, array_slice(array_merge([$value], $rest), 0, $args));
+        }
         return $value;
+    }
+}
+
+if (!function_exists('do_action')) {
+    function do_action($hook, ...$rest) {
+        foreach ($GLOBALS['__mock_hooks'][$hook] ?? [] as [$callback, $args]) {
+            call_user_func_array($callback, array_slice($rest, 0, $args));
+        }
+    }
+}
+
+if (!function_exists('remove_all_filters')) {
+    function remove_all_filters($hook) {
+        unset($GLOBALS['__mock_hooks'][$hook]);
+        return true;
     }
 }
 
@@ -154,6 +176,37 @@ if (!function_exists('plugin_basename')) {
     function plugin_basename($file) {
         return basename(dirname($file)) . '/' . basename($file);
     }
+}
+
+$GLOBALS['__mock_user_meta'] = [];
+$GLOBALS['__mock_screen'] = 'plugins';
+
+if (!function_exists('get_current_user_id')) {
+    function get_current_user_id() { return 1; }
+}
+if (!function_exists('get_user_meta')) {
+    function get_user_meta($user_id, $key = '', $single = false) { return $GLOBALS['__mock_user_meta'][$key] ?? ''; }
+}
+if (!function_exists('get_current_screen')) {
+    function get_current_screen() { return (object) ['id' => $GLOBALS['__mock_screen']]; }
+}
+if (!function_exists('admin_url')) {
+    function admin_url($path = '') { return 'https://example.com/wp-admin/' . $path; }
+}
+if (!function_exists('wp_nonce_url')) {
+    function wp_nonce_url($url, $action = -1) { return $url . '&_wpnonce=test'; }
+}
+if (!function_exists('esc_url')) {
+    function esc_url($url) { return htmlspecialchars($url, ENT_QUOTES); }
+}
+if (!function_exists('esc_html__')) {
+    function esc_html__($text, $domain = 'default') { return htmlspecialchars($text); }
+}
+if (!function_exists('esc_html_e')) {
+    function esc_html_e($text, $domain = 'default') { echo htmlspecialchars($text); }
+}
+if (!function_exists('__return_false')) {
+    function __return_false() { return false; }
 }
 
 // -------------------------------------------------------------
